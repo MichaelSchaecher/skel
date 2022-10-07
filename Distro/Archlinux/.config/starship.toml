@@ -15,8 +15,8 @@ format = """
 ($git_branch$git_status)
 $character
 """
-scan_timeout = 5_000
-command_timeout = 5_000
+scan_timeout = 2_000
+command_timeout = 7_000
 
 # Replace the ugly "❯" symbol with "ﰲ" in the prompt.
 [character]

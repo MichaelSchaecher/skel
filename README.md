@@ -1,0 +1,1 @@
+This is the default `/etc/skel` user profile I use for both my WSL2 Archlinux install and any bare metal system. To install as the default, first unpack the ISO and place the the `/etc/skel` directory. Once the system is installed any user profile that is setup will use the the following configuration.

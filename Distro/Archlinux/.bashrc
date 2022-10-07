@@ -12,7 +12,7 @@ function cp2pi () { scp ${1} pihole:${2} ; }
 # input option there is less chance errors.
 function extract () {
 
-        outDir="$(echo "${1}" | awk -F'.' '{print $1}')"	# Set out directory from source.
+        local outDir="$(echo "${1}" | awk -F'.' '{print $1}')"	# Set out directory from source.
 
 	case "${1}" in
 		*.tar.bz2|*.tbz2	)       tar xvjf "${1}" -C "${outDir}" ;;
@@ -46,13 +46,14 @@ function colorLess () {
 
 	# Determend with language syntex is being color coded.
 	case "$(echo ${1} | awk -F'.' 'NF>1{print $NF}')" in
-		"${cppSource}"		) local addColor="cpp"    ;;
-		"${scrSource}"		) local addColor="bash"   ;;
-		"${pySource}"		) local addColor="py"     ;;
-		"${iniSource}"		) local addColor="config" ;;
-		"${mkSource}"		) local addColor="make"   ;;
-		md|1.md			) local addColor="md"     ;;
-		toml			) local addColor="toml"   ;;
+		"${cppSource}"		) local addColor="cpp"  ;;
+		"${scrSource}"		) local addColor="bash" ;;
+		"${pySource}"		) local addColor="py"   ;;
+		"${iniSource}"		) local addColor="ini"  ;;
+		"${mkSource}"		) local addColor="make" ;;
+		md			) local addColor="md"   ;;
+		toml			) local addColor="toml" ;;
+		dir_color		) local addColor="ruby"	;;
 		*)
 			# For files that do not have a file extension then try some other way to get the
 			# file type. Warning this may fail with some files.
@@ -60,14 +61,12 @@ function colorLess () {
 				local addColor="bash"
 			elif awk 'NR==1 {print}' ${1} | grep -q 'python' ; then
 				local addColor="py"
-			elif file ${1} | grep -qE 'Unicode|ASCII' ; then
-				pygmentize -f 256 ${1} | less
 			fi
 		;;
 	esac
 
 	# Set the syntex color or not.
-	test -n "${addColor}" && pygmentize -f 256 -l "${addColor}" "$1" | less || less ${1}
+	test -n "${addColor}" && pygmentize -f 256 -l "${addColor}" "$1" 2> /dev/null | less || less ${1}
 
 }
 
@@ -95,10 +94,6 @@ function histControl () {
 	tac "$HISTFILE" | awk '!x[$0]++' > ~/.bash_history.old && {
 		tac ~/.bash_history.old > "$HISTFILE" ; rm ~/.bash_history.old ; }
 }
-
-# Make sure the shell is interactive by checking if the variable `PS1` is set. This needs to be done ever
-# though the `bash prompt` is not used. If everything checkouts enable bash completion if not enabled.
-test -z "${PS1}" && return || source "/usr/share/bash-completion/bash_completion"
 
 # Enable some useful feature that makes `bash` more like `zsh` then people think.
 shopt -s checkwinsize ; shopt -s autocd	 ; shopt -s cdspell ; shopt -s extglob ;
@@ -150,14 +145,13 @@ alias checkout='git checkout -b'				# Create new git repo branch.
 alias merge='git merge'						# Merge git repo.
 alias commit='git commit -m'					# Commit changes with message.
 alias push='git push origin $(git describe --abbrev=0)'		# Push current tag to remote.
-
-# Push current branch to remote.
-alias upstream='git push origin $(git symbolic-ref --short -q HEAD)'
+alias github='git push origin $(git symbolic-ref --short HEAD)' # Push current branch to remote.
 
 alias create='gh release create'				# Create new Github release.
 alias delete='gh release delete'				# Delete Github release.
 alias delasset='gh release delete-asset'			# Delete Github release asset.
 alias upload='gh release upload --clobber'			# Upload release asset.
+alias repo='gh repo create'					# Create new Github repo.
 
 alias ls='ls -a --color=auto'					# Add color to list output.
 alias grep='grep --color=auto'					# Grep needs some color too.
@@ -173,13 +167,11 @@ alias kernel='~/Projects/linux-kernel'				# Kernel source directory.
 alias website='Projects/MichaelSchaecher.github.io'		# GitHub webpage.
 alias manhole='~/Projects/manhole'				# Local git repo for pihole-manager.
 
-# Remove/Move.
 alias rm='rm -f'						# Force removal.
 alias mv='mv -f'						# Force move.
 
 alias ln='ln -f'						# Always force creating a soft/hard link.
 
-# Archiving.
 alias xz='tar cvf'						# Create tar.xz archive.
 alias gz='tar cvjf'						# Create tar.gz archive
 alias bzip2='bzip2 -zk'						# Create bzip archive.
