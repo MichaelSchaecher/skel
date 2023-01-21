@@ -120,14 +120,15 @@ export LESS_TERMCAP_me=$(echo -e "\e[0m")			# reset bold/blink.
 export LESS_TERMCAP_se=$(echo -e "\e[0m")			# reset reverse video.
 export LESS_TERMCAP_ue=$(echo -e "\e[0m")			# reset underline.
 
-# for konsole and gnome-terminal.
-export GROFF_NO_SGR=1
+export GROFF_NO_SGR=1						# for konsole and gnome-terminal.
+
+export STARSHIP_LOG=error					# Don't show Starship warnings or errors.
 
 # If `shopt -s histappend` is Then allow the history to be search if using similar command.
 bind '"\033[A": history-search-backward'
 bind '"\033[B": history-search-forward'
 
-alias gcc='gcc -fdiagnostics-color=auto'			# Add color to gcc.
+alias gcc='gcc -f --diagnostics-color=auto'			# Add color to gcc.
 
 alias inst='yay -S --noconfirm'					# Install package.
 alias uinst='yay -Rsc --noconfirm'				# Remove/uninstall application.
@@ -137,7 +138,6 @@ alias query='yay -Qe'						# Query explicitly-installed packages.
 
 alias add='git add .'						# Add all changes to local git repo.
 alias new='git init'						# Initialize new local git repo.
-alias clone='git clone'						# Clone a git repository.
 alias branch='git checkout'					# Switch between git repo branches.
 alias tag='git tag -a'						# Create git tag.
 alias delete='git branch -D'					# Delete git branch.
@@ -147,9 +147,10 @@ alias commit='git commit -m'					# Commit changes with message.
 alias push='git push origin $(git describe --abbrev=0)'		# Push current tag to remote.
 alias github='git push origin $(git symbolic-ref --short HEAD)' # Push current branch to remote.
 
+alias clone='gh repo clone'					# Clone a git repository.
 alias create='gh release create'				# Create new Github release.
-alias delete='gh release delete'				# Delete Github release.
-alias delasset='gh release delete-asset'			# Delete Github release asset.
+alias delete='gh release delete --yes'				# Delete Github release.
+alias delasset='gh release delete-asset --yes'			# Delete Github release asset.
 alias upload='gh release upload --clobber'			# Upload release asset.
 alias repo='gh repo create'					# Create new Github repo.
 

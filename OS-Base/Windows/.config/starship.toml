@@ -1,0 +1,96 @@
+# ~/.config/starship.toml
+
+# The prompt should set the tone of the theme of general terminal/shell.
+
+# The colors use hexadecimal.
+# 	Purple       = 127
+#	Light Purple = 225
+
+[line_break]
+disabled = true								# Stop allowing a divided prompt
+add_newline = false							# Do not add new line after command completion.
+format = """
+($username$hostname)
+[$directory]
+($git_branch$git_status)
+$character
+"""
+scan_timeout = 2_000
+command_timeout = 7_000
+
+# Replace the ugly "❯" symbol with "ﰲ" in the prompt.
+[character]
+success_symbol = " [ﰲ](bold fg:225) "
+error_symbol = " [ﰲ](bold fg:127) "					# If command fails set color to Java.
+vicmd_symbol = " [ﰯ](bold fg:225) "					# Text input for vim normal mode.
+format = "$symbol "
+
+[cmd_duration]
+disabled = true								# Cool, but not useful to me.
+
+[container]
+symbol = "⬢"
+style = "bold red dimmed"
+format = " [$symbol \\[$name\\]]($style)"
+disabled = true
+
+[directory]
+style = "bold fg:127"							# Use the same color for the text as hostname/username background.
+home_symbol = " "							# Display "~" as "ﯗ".
+read_only = "  "							# Show if folder/directory is read-only.
+read_only_style = "bold fg:225"
+truncation_length = 1							# Only display the currect working directory.
+format = " [in](bold fg:#FBD8FD) [$path]($style)[$read_only]($read_only_style)$home_symbol"
+
+# The git branch name and branch set from within "[]" brackets.
+[git_branch]
+always_show_remote = false						# Do not show remote branch
+style = "bold fg:127"							# Text color.
+symbol = "  "								# Git symbol.
+#truncation_length = '2^63 - 1'						# Shorten long branch names.
+#truncation_symbol = "..."
+only_attached = false							# Not attached is not an error, so show branch name.
+format = "[$symbol]($style) [$branch](bold fg:225)"
+
+[git_status]
+disabled = false
+style = "bold fg:127"							# Dark Magenta color.
+conflicted = " "							# Branch in conflict.
+ahead = " "								# Branch is ahead by one or more commits.
+behind = " "								# Branch is behind by one or more commits.
+diverged = " "								# Current branch has diverged.
+up_to_date = " "							# Up-to-date.
+untracked = " "							# Untracked changes.
+stashed = " "								# Stashed commit.
+modified = " "								# Modified directory/file.
+staged = " "								# Staged commits.
+renamed = " "								# File/directory renamed.
+deleted = " "								# Deleted file/dicertory.
+format = "[$all_status$ahead_behind]($style) "
+
+[hostname]
+ssh_only = true								# Show only when ssh'd into remote host.
+style = "bold fg:#FBD8FD bg:127"					# highlight.
+format = "[@ssh:$hostname]($style)"
+
+[package]
+disabled = true                                                         # Display the icon for cargo
+
+[python]
+disabled = true								# Do not show python version.
+
+[rust]
+disabled = true                                                         # Disable rust version and icon.
+
+[ruby]
+disabled = true
+
+[time]
+disabled = true								# Disable clock in prompt.
+
+[username]
+show_always = true							# Yes show who I am.
+disabled = false
+style_user = "bold fg:225 bg:127"					# Highlight.
+style_root = "bold fg:127 bg:225"					# Highlight with lighter color.
+format = "[$user]($style)"
