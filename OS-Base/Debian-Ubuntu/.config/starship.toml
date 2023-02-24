@@ -54,8 +54,8 @@ format = "[$symbol]($style) [$branch](bold fg:225)"
 
 [git_status]
 disabled = false
-style = "bold fg:127"							# Dark Magenta color.
-conflicted = " "							    # Branch in conflict.
+style = "bold fg:127"   						# Dark Magenta color.
+conflicted = " "   					    # Branch in conflict.
 ahead = " "								    # Branch is ahead by one or more commits.
 behind = " "								    # Branch is behind by one or more commits.
 diverged = " "								    # Current branch has diverged.
@@ -74,7 +74,7 @@ style = "bold fg:#FBD8FD bg:127"				# highlight.
 format = "[@ssh:$hostname]($style)"
 
 [package]
-disabled = truncation_length                    # Display the icon for cargo
+disabled = true                    # Display the icon for cargo
 
 [python]
 disabled = true								    # Do not show python version.
