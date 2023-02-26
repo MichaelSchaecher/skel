@@ -2,9 +2,7 @@
 
 # The prompt should set the tone of the theme of general terminal/shell.
 
-# The colors use hexadecimal.
-# 	Purple       = 127
-#	Light Purple = 225
+# The colors use 256bit xTerm. Purple = 127 & light Purple = 225
 
 [line_break]
 disabled = true								    # Stop allowing a divided prompt
@@ -35,7 +33,7 @@ format = " [$symbol \\[$name\\]]($style)"
 disabled = true
 
 [directory]
-style = "bold fg:127"							# Use the same color for the text as hostname/username background.
+style = "bold fg:127"							# Foreground show be the color of the background here.
 home_symbol = " "							    # Display "~" as "ﯗ".
 read_only = "  "							    # Show if folder/directory is read-only.
 read_only_style = "bold fg:225"
@@ -55,7 +53,7 @@ format = "[$symbol]($style) [$branch](bold fg:225)"
 [git_status]
 disabled = false
 style = "bold fg:127"   						# Dark Magenta color.
-conflicted = " "   					    # Branch in conflict.
+conflicted = " "								# Branch in conflict.
 ahead = " "								    # Branch is ahead by one or more commits.
 behind = " "								    # Branch is behind by one or more commits.
 diverged = " "								    # Current branch has diverged.
