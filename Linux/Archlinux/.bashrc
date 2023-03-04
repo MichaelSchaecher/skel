@@ -122,7 +122,7 @@ export LESS_TERMCAP_ue=$(echo -e "\e[0m")			# reset underline.
 
 export GROFF_NO_SGR=1						# for konsole and gnome-terminal.
 
-export STARSHIP_LOG=error					# Don't show Starship warnings or errors.
+export STARSHIP_LOG=error					# "Don't" show Starship warnings or errors.
 
 # If `shopt -s histappend` is Then allow the history to be search if using similar command.
 bind '"\033[A": history-search-backward'

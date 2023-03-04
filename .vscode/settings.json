@@ -1,0 +1,13 @@
+{
+	"editor.insertSpaces": false,
+	"editor.tabSize": 4,
+	"editor.tabCompletion": "onlySnippets",
+	"editor.acceptSuggestionOnEnter": "smart",
+	"diffEditor.ignoreTrimWhitespace": true,
+	"editor.trimAutoWhitespace": true,
+	"files.trimTrailingWhitespace": true,
+	"terminal.integrated.cursorBlinking": true,
+	"terminal.integrated.env.linux": {
+
+	}
+}

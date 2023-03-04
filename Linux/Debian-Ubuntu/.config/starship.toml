@@ -14,7 +14,7 @@ format = """
 $character
 """
 scan_timeout = 2_000
-command_timeout = 7_000
+command_timeout = 2_000
 
 # Replace the ugly "❯" symbol with "ﰲ" in the prompt.
 [character]
@@ -45,8 +45,8 @@ format = " [in](bold fg:#FBD8FD) [$path]($style)[$read_only]($read_only_style)$h
 always_show_remote = false						# Do not show remote branch
 style = "bold fg:127"							# Text color.
 symbol = "  "								    # Git symbol.
-#truncation_length = '2^63 - 1'				    # Shorten long branch names.
-#truncation_symbol = "..."
+truncation_length = '10'						# Shorten long branch names.
+truncation_symbol = "..."
 only_attached = false							# Not attached is not an error, so show branch name.
 format = "[$symbol]($style) [$branch](bold fg:225)"
 
@@ -68,20 +68,21 @@ format = "[$all_status$ahead_behind]($style) "
 
 [hostname]
 ssh_only = true								    # Show only when ssh'd into remote host.
+trim_at = ''									# Don't trim the hostname.
 style = "bold fg:#FBD8FD bg:127"				# highlight.
 format = "[@ssh:$hostname]($style)"
 
 [package]
-disabled = true									# Display the icon for cargo
+disabled = true                    				# Display the icon for cargo
 
 [python]
-disabled = true								    # Do not show python version.
+disabled = true								    # Disable python version and icon.
 
 [rust]
 disabled = true                                 # Disable rust version and icon.
 
 [ruby]
-disabled = true
+disabled = true									# Disable ruby version and icon
 
 [time]
 disabled = true								    # Disable clock in prompt.
