@@ -9,17 +9,19 @@
 # input option there is less chance errors.
 function extract () {
 
-    local outDir="$(echo "${1}" | awk -F'.' '{print $1}')"		# Set out directory from source.
+	local outDir
+
+    outDir="$(echo "${1}" | awk -F'.' '{print $1}')"			# Set out directory from source.
 
 	case "${1}" in
-		*.tar.bz2|*.tbz2	)       tar xvjf "${1}" -C "${outDir}"	;;
-		*.tar.gz|*.tgz		)       tar xvzf "${1}" -C "${outDir}"	;;
-		*.tar.xz|*.tar		)       tar xvf "${1}" -C "${outDir}"	;;
-		*.bz2				)	bunzip2 -vd "${1}"					;;
-		*.rar				)       rar a "${1}" "${outDir}"		;;
-		*.gz				)	gunzip "${1}"						;;
-		*.zip				)	unzip "${1}"						;;
-		*.7z				)	7z x "${1}"							;;
+		*.tar.bz2|*.tbz2	)	tar xvjf "${1}" -C "${outDir}"	;;
+		*.tar.gz|*.tgz		)	tar xvzf "${1}" -C "${outDir}"	;;
+		*.tar.xz|*.tar		)	tar xvf "${1}" -C "${outDir}"	;;
+		*.bz2				)	bunzip2 -vd "${1}"				;;
+		*.rar				)	rar a "${1}" "${outDir}"		;;
+		*.gz				)	gunzip "${1}"					;;
+		*.zip				)	unzip "${1}"					;;
+		*.7z				)	7z x "${1}"						;;
 		*					)
 			# Echo common error regradeless if file exists.
 			test -f "${1}" && {
@@ -35,16 +37,18 @@ function extract () {
 # that only code has bugs not features.
 function colorLess () {
 
-	local cppSource="*[ch]|[ch]pp|[ch]xx|[ch]++|cc|hh|CPP|C|H|*cp"
-	local scrSource="profile|bash_*|sh|ksh|bash|ebuild|eclass|bashrc|exheres-0|exlib|zsh|zshrc"
-	local pySource="py|pyw|sc|tac|sage"
-	local iniSource="in|config|conf|cnf|fstab"
-	local mkSource="mk|mak|Makefile|makefile"
+	local ccpSource srcSource pySource iniSource mkSource
+
+	ccpSource="*[ch]|[ch]pp|[ch]xx|[ch]++|cc|hh|CPP|C|H|*cp"
+	srcSource="profile|bash_*|sh|ksh|bash|ebuild|eclass|bashrc|exheres-0|exlib|zsh|zshrc"
+	pySource="py|pyw|sc|tac|sage"
+	iniSource="in|config|conf|cnf|fstab"
+	mkSource="mk|mak|Makefile|makefile"
 
 	# Determend with language syntex is being color coded.
-	case "$(echo ${1} | awk -F'.' 'NF>1{print $NF}')" in
-		"${cppSource}"		) local addColor="cpp"	;;
-		"${scrSource}"		) local addColor="bash"	;;
+	case "$(echo "${1}" | awk -F'.' 'NF>1{print $NF}')" in
+		"${ccpSource}"		) local addColor="cpp"	;;
+		"${srcSource}"		) local addColor="bash"	;;
 		"${pySource}"		) local addColor="py"   ;;
 		"${iniSource}"		) local addColor="ini"  ;;
 		"${mkSource}"		) local addColor="make" ;;
@@ -54,16 +58,16 @@ function colorLess () {
 		*)
 			# For files that do not have a file extension then try some other way to get the
 			# file type. Warning this may fail with some files.
-			if awk 'NR==1 {print}' ${1} | grep -q 'bash' ; then
+			if awk 'NR==1 {print}' "${1}" | grep -q 'bash' ; then
 				local addColor="bash"
-			elif awk 'NR==1 {print}' ${1} | grep -q 'python' ; then
+			elif awk 'NR==1 {print}' "${1}" | grep -q 'python' ; then
 				local addColor="py"
 			fi
 		;;
 	esac
 
 	# Set the syntex color or not.
-	test -n "${addColor}" && pygmentize -f 256 -l "${addColor}" "$1" 2> /dev/null | less || less ${1}
+	if test -n "${addColor}" ; then pygmentize -f 256 -l "${addColor}" "$1" 2> /dev/null | less ; else less ${1} ; fi
 
 }
 
@@ -71,22 +75,25 @@ function colorLess () {
 # history being from with in this function being run pier to the command its self would cause the bash's
 # history file would be populated incorrectly or not at all.
 function histControl () {
+
 	# The `starship_precmd` is the default PROMPT_COMMAND for `starship.`
-	export PROMPT_COMMAND="starship_precmd; history -w"
+	PROMPT_COMMAND="starship_precmd; history -w"
 
 	# Manage the history for the environment. Don't put duplicate lines or lines starting with space
 	# in the history.
 	# Then erase previous matching command. See bash(1) for more options.
-	export HISTCONTROL='ignoredups:ignorespace:erasedups'
+	HISTCONTROL='ignoredups:ignorespace:erasedups'
 
 	# Ignore the following to keep bash_history from being over populated.
-	export HISTIGNORE='ls:cd:pwd:history:clear:back:home:exit:source'
+	HISTIGNORE='ls:cd:pwd:history:clear:back:home:exit:source'
 
 	# A Larger history file size would is better.
-	export HISTFILESIZE="100000" ; export  HISTSIZE="1000000"
+	HISTFILESIZE="100000" ; export  HISTSIZE="1000000"
 
 	# Add date and time for commands, with color.
-	export HISTTIMEFORMAT=$(echo -e "\e[${PURPLE}m%d/%m/%y %T \e[0m")
+	HISTTIMEFORMAT=$(echo -e "\e[${PURPLE}m%d/%m/%y %T \e[0m")
+
+	export PROMPT_COMMAND HISTCONTROL HISTIGNORE HISTFILESIZE HISTSIZE HISTTIMEFORMAT
 
 	if test -f "${HISTFILE}" ; then
 		tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
@@ -107,23 +114,25 @@ BLUE="38;5;63"    ; CYAN="38;5;109" ; GREEN="38;5;78"  ; ORANGE="38;5;208"
 PURPLE="38;5;127" ; RED="38;5;202"  ; LIGHT="38;5;225" ; H_LIGHT="48;5;225"
 
 # Colored GCC warnings and errors
-export GCC_COLORS="error=$RED:warning=$ORANGE:note=$BLUE:caret=$PURPLE:locus=$CYAN:quote=$GREEN"
+GCC_COLORS="error=$RED:warning=$ORANGE:note=$BLUE:caret=$PURPLE:locus=$CYAN:quote=$GREEN" ; export GCC_COLORS
 
 # Some may laugh about using nano, but I barely use a cli text editor, so there.
-export EDITOR=nano
+EDITOR=nano ; export EDITOR
 
 # Have less display colours for manpage.
-export LESS_TERMCAP_mb=$(echo -e "\e[${PURPLE};3m")				# begin bold.
-export LESS_TERMCAP_md=$(echo -e "\e[${PURPLE}m")				# begin blink.
-export LESS_TERMCAP_so=$(echo -e "\e[${H_LIGHT};${PURPLE}m")	# begin reverse video.
-export LESS_TERMCAP_us=$(echo -e "\e[${LIGHT};4m")				# begin underline.
-export LESS_TERMCAP_me=$(echo -e "\e[0m")						# reset bold/blink.
-export LESS_TERMCAP_se=$(echo -e "\e[0m")						# reset reverse video.
-export LESS_TERMCAP_ue=$(echo -e "\e[0m")						# reset underline.
+LESS_TERMCAP_mb=$(echo -e "\e[${PURPLE};3m")					# begin bold.
+LESS_TERMCAP_md=$(echo -e "\e[${PURPLE}m")						# begin blink.
+LESS_TERMCAP_so=$(echo -e "\e[${H_LIGHT};${PURPLE}m")			# begin reverse video.
+LESS_TERMCAP_us=$(echo -e "\e[${LIGHT};4m")						# begin underline.
+LESS_TERMCAP_me=$(echo -e "\e[0m")								# reset bold/blink.
+LESS_TERMCAP_se=$(echo -e "\e[0m")								# reset reverse video.
+LESS_TERMCAP_ue=$(echo -e "\e[0m")								# reset underline.
 
-export GROFF_NO_SGR="1"											# for konsole and gnome-terminal.
+GROFF_NO_SGR="1"												# for konsole and gnome-terminal.
 
-export STARSHIP_LOG="error"										# Don't show Starship warnings or errors.
+export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_so LESS_TERMCAP_us LESS_TERMCAP_me LESS_TERMCAP_se LESS_TERMCAP_ue GROFF_NO_SGR
+
+STARSHIP_LOG="error" ; export STARSHIP_LOG						# Don't show Starship warnings or errors.
 
 # If `shopt -s histappend` is Then allow the history to be search if using similar command.
 bind '"\033[A": history-search-backward'
@@ -132,7 +141,7 @@ bind '"\033[B": history-search-forward'
 alias gcc='gcc -fdiagnostics-color=auto'						# Add color to gcc.
 
 alias inst='sudo apt install --yes'								# Install package.
-alias uinst='sudo apt install --yes --autoremove'				# Remove/uninstall application.
+alias uinst='sudo apt purge --yes --autoremove'					# Remove/uninstall application.
 alias srch='apt search'											# Search for application.
 alias upgrade='sudo apt update && sudo apt upgrade --yes'  		# Upgrade installed applications.
 alias query='sudo apt list'										# Query explicitly-installed packages.
@@ -198,5 +207,6 @@ eval "$(dircolors -b ~/.dir_color)"								# Set new color scheme for `ls` comma
 # `~/.config/starship.toml`. By having the prompt being handled outside of `bash` the command histroy is
 # not populated correctly. A workaround is to rebuild the ~/.bash_history after every command is completed.
 
+# Shellcheck disable=SC2034
 starship_precmd_user_func="histControl"							# Manage the bash history.
 eval "$(starship init bash)"									# Start Starship Prompt.

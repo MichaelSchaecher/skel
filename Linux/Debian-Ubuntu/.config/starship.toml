@@ -1,95 +1,105 @@
 # ~/.config/starship.toml
 
-# The prompt should set the tone of the theme of general terminal/shell.
+# This is my starship.toml file for my personal computer at home running KDE Neon and/or Windows 10/11.
 
-# The colors use 256bit xTerm. Purple = 127 & light Purple = 225
+# feel free to use it as a template for your own starship.toml file if you like it or the color purple.
+
+# Using 256bit colors in the terminal:
+# Purple: 127
+# Ligth: 225
+
+# Text styles is always bold.
 
 [line_break]
-disabled = true								    # Stop allowing a divided prompt
-add_newline = false							    # Do not add new line after command completion.
+disabled = true								    				# Stop allowing a divided prompt
+add_newline = false							    				# Do not add new line after command completion.
 format = """
 ($username$hostname)
 [$directory]
 ($git_branch$git_status)
 $character
 """
-scan_timeout = 2_000
-command_timeout = 2_000
+scan_timeout = 2_000											# timeout for scanning files in the current directory.
+command_timeout = 2_000											# command timeout, this is disabled by default in the ~/.bashrc file.
 
-# Replace the ugly "❯" symbol with "ﰲ" in the prompt.
+# The default prompt symbol is "❯". I don't like it so I changed it to .
 [character]
-success_symbol = " [ﰲ](bold fg:225) "
-error_symbol = " [ﰲ](bold fg:127) "				# If command fails set color to Java.
-vicmd_symbol = " [ﰯ](bold fg:225) "				# Text input for vim normal mode.
-format = "$symbol "
+success_symbol = ""											# The symbol to be shown when the last command finished successfully.
+error_symbol = " !"											# The symbol to be shown when the last command exited with a failure code.
+vicmd_symbol = ""												# The symbol to be shown when the shell is in vim normal mode.
+format = " $symbol "											# The format for the symbol.
 
+# Show the command execution time is not useful for me so I disabled it.
 [cmd_duration]
-disabled = true								    # Cool, but not useful to me.
+disabled = true													# Disable the command execution time.
 
+# Disable the container module.
 [container]
-symbol = "⬢"
-style = "bold red dimmed"
-format = " [$symbol \\[$name\\]]($style)"
-disabled = true
+disabled = true													# Disable the container module.
 
+# The directory module is enabled by default but I changed the format. The text is purple and bold, and the symbol is  for the home directory.
+# For root or read onley the symbol is 󰃖.
 [directory]
-style = "bold fg:127"							# Foreground show be the color of the background here.
-home_symbol = " "							    # Display "~" as "ﯗ".
-read_only = "  "							    # Show if folder/directory is read-only.
-read_only_style = "bold fg:225"
-truncation_length = 1							# Only display the currect working directory.
+disabled = false												# Disable the directory module.
+read_only = " 󰃖 "												 # The symbol to be shown when the current directory is read only.
+home_symbol = "  "												# The symbol to be shown when the current directory is $HOME.
+style = "bold fg:127"											# The style for the module.
+read_only_style = "bold fg:127"									# The style for when the current directory is read only.
+truncation_length = 1											# Truncate parent directories to the specified number of characters.
 format = " [in](bold fg:#FBD8FD) [$path]($style)[$read_only]($read_only_style)$home_symbol"
+
 
 # The git branch name and branch set from within "[]" brackets.
 [git_branch]
-always_show_remote = false						# Do not show remote branch
-style = "bold fg:127"							# Text color.
-symbol = "  "								    # Git symbol.
-truncation_length = '10'						# Shorten long branch names.
+always_show_remote = false										# Do not show remote branch
+style = "bold fg:127"											# Text color.
+symbol = "  "								    				# Git symbol.
+truncation_length = 10											# Shorten long branch names.
 truncation_symbol = "..."
-only_attached = false							# Not attached is not an error, so show branch name.
+only_attached = false											# Not attached is not an error, so show branch name.
 format = "[$symbol]($style) [$branch](bold fg:225)"
 
 [git_status]
-disabled = false
-style = "bold fg:127"   						# Dark Magenta color.
-conflicted = " "								# Branch in conflict.
-ahead = " "								    # Branch is ahead by one or more commits.
-behind = " "								    # Branch is behind by one or more commits.
-diverged = " "								    # Current branch has diverged.
-up_to_date = " "							    # Up-to-date.
-untracked = " "							    # Untracked changes.
-stashed = " "								    # Stashed commit.
-modified = " "								    # Modified directory/file.
-staged = " "								    # Staged commits.
-renamed = " "								    # File/directory renamed.
-deleted = " "								    # Deleted file/dicertory.
+disabled = false												# Never disable the git status module.
+style = "bold fg:127"   										# Dark Magenta color.
+conflicted = " "												# Branch in conflict.
+ahead = " "								    				# Branch is ahead by one or more commits.
+behind = " "								    				# Branch is behind by one or more commits.
+diverged = " "								   					# Current branch has diverged.
+up_to_date = " "							    				# Up-to-date.
+untracked = " "							    				# Untracked changes.
+stashed = " "								    				# Stashed commit.
+modified = " "								    				# Modified directory/file.
+staged = " "								    				# Staged commits.
+renamed = " "								    				# File/directory renamed.
+deleted = " "								    				# Deleted file/dicertory.
 format = "[$all_status$ahead_behind]($style) "
 
 [hostname]
-ssh_only = true								    # Show only when ssh'd into remote host.
-trim_at = ''									# Don't trim the hostname.
-style = "bold fg:#FBD8FD bg:127"				# highlight.
+ssh_only = true								    				# Show only when ssh'd into remote host.
+trim_at = ''													# Don't trim the hostname.
+style = "bold fg:#FBD8FD bg:127"								# highlight.
 format = "[@ssh:$hostname]($style)"
 
 [package]
-disabled = true                    				# Display the icon for cargo
+disabled = true                    								# Display the icon for cargo
 
 [python]
-disabled = true								    # Disable python version and icon.
+disabled = true								    				# Disable python version and icon.
 
 [rust]
-disabled = true                                 # Disable rust version and icon.
+disabled = true                                 				# Disable rust version and icon.
 
 [ruby]
-disabled = true									# Disable ruby version and icon
+disabled = true													# Disable ruby version and icon
 
 [time]
-disabled = true								    # Disable clock in prompt.
+disabled = true								    				# Disable clock in prompt.
 
 [username]
-show_always = true							    # Yes show who I am.
+show_always = true							    				# Yes show who I am.
 disabled = false
-style_user = "bold fg:225 bg:127"				# Highlight.
-style_root = "bold fg:127 bg:225"				# Highlight with lighter color.
+style_user = "bold fg:225 bg:127"								# Highlight.
+style_root = "bold fg:127 bg:225"								# Highlight with lighter color.
 format = "[$user]($style)"
+
