@@ -1,0 +1,28 @@
+#!/bin/env bash
+
+# Install the prompt configure files for Starship and Bash.
+
+debDir="Linux/Debian-Ubuntu"
+archDir="Linux/Archlinux"
+
+helpMe="$(cat <<EOF
+Usage: install [OPTION]...
+
+Options:
+	--debian			Install for Debian based distros.
+	--arch				Install for Arch based distros.
+	-h | --help			Show this help message.
+EOF
+)"
+
+# The install is local to the user and not system wide.
+case "${1}" in
+	--debian				)
+		cp -vrf ${debDir}/.{bashrc,config/starship.toml,less,profile,dir_color,nanorc,bash_logout} ~/	;;
+	--arch					)
+		cp -vrf ${archDir}/.{bashrc,config/starship.toml,less,profile,dir_color,nanorc,bash_logout} ~/	;;
+	-h | --help				)	echo "${helpMe}"  														;;
+esac
+
+# Apply the changes to the current shell.
+source ~/.bashrc
