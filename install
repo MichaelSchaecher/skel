@@ -7,22 +7,63 @@ archDir="Linux/Archlinux"
 
 helpMe="$(cat <<EOF
 Usage: install [OPTION]...
+Usage: install <distro> [-p <password>] [-y]
 
 Options:
 	--debian			Install for Debian based distros.
 	--arch				Install for Arch based distros.
+	-y | --yes			Answer yes to all questions.
+	-p | --password		Set the password for the root user.
 	-h | --help			Show this help message.
 EOF
 )"
 
-# The install is local to the user and not system wide.
-case "${1}" in
-	--debian				)
-		cp -vrf ${debDir}/.{bashrc,config/starship.toml,less,profile,dir_color,nanorc,bash_logout} ~/	;;
-	--arch					)
-		cp -vrf ${archDir}/.{bashrc,config/starship.toml,less,profile,dir_color,nanorc,bash_logout} ~/	;;
-	-h | --help				)	echo "${helpMe}"  														;;
-esac
+# If the script was executed with sudo command then the user will be root, but still need the name of the user
+# to install the config files for that user, so get the name of the user from the SUDO_USER variable.
 
-# Apply the changes to the current shell.
+# Use case statement to check for arguments.
+while true ; do case "${1}" in
+	--debian		)
+		cp -rvf ${debDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} ~/
+	;;
+	--arch			)
+		cp -rvf ${archDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} ~/
+	;;
+	-p | --password		)
+		# Set the password for the root user and store it in a variable.
+		sudoPassword="${2}"
+	;;
+	-y | --yes		)
+
+		# Force yes to root user install.
+		forceYes="true"
+
+		# Install as root, passing the password to the sudo command if it was set.
+		if test -n "${sudoPassword}" ; then
+			echo "${sudoPassword}" | sudo -S cp -rvf ${debDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} /root/
+		else
+			sudo cvp -rvf ${debDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} /root/
+		fi
+	;;
+	-h | --help		)	echo "${helpMe}" ; exit 0 ;;
+esac ; shift && test -n "${1}" || break ; done
+
+# Before exiting ask if the user wants to install the config files for the root user only if the
+# variable forceYes is not set to true.
+if test -z "${forceYes}" ; then
+	read -pr "Install for root user? [y/N] " installRoot ; case "${1}" in
+		y | Y		)
+			if test -n "${sudoPassword}" ; then
+				echo "${sudoPassword}" | sudo -S cp -rvf ${debDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} /root/
+			else
+				sudo cp -rvf ${debDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} /root/
+			fi
+		;;
+		n|N		)	echo "Not installing for root user." ;;
+		*		)	echo "Please answer yes or no." ; bash install "${@}" ;;
+	esac
+fi
+
 source ~/.bashrc
+
+exit 0
