@@ -140,11 +140,21 @@ bind '"\033[B": history-search-forward'
 
 alias gcc='gcc -fdiagnostics-color=auto'						# Add color to gcc.
 
-alias inst='sudo apt install --yes'								# Install package.
-alias uinst='sudo apt purge --yes --autoremove'					# Remove/uninstall application.
-alias srch='apt search'											# Search for application.
-alias upgrade='sudo apt update && sudo apt upgrade --yes'  		# Upgrade installed applications.
-alias query='sudo apt list'										# Query explicitly-installed packages.
+test "${ID_LIKE}" = "arch" && {
+alias inst='yay -S --noconfirm'                                 # Install package.
+alias uinst='yay -Rsc --noconfirm'                              # Remove/uninstall application.
+alias srch='yay -Ss'                                            # Search for application.
+alias update='yay -Syu --noconfirm'                             # Upgrade installed applications.
+alias query='yay -Qe'                                           # Query explicitly-installed packages.
+}
+
+test "${ID_LIKE}" = "debian" || test "${ID}" = "debian" && {
+alias inst='sudo apt install --yes'                             # Install package.
+alias uinst='sudo apt install --yes --autoremove'               # Remove/uninstall application.
+alias srch='apt search'                                         # Search for application.
+alias update='sudo apt update && sudo apt upgrade --yes'        # Upgrade installed applications.
+alias query='sudo apt list'                                     # Query explicitly-installed packages.
+}
 
 alias add='git add .'											# Add all changes to local git repo.
 alias new='git init'											# Initialize new local git repo.

@@ -2,16 +2,12 @@
 
 # Install the prompt configure files for Starship and Bash.
 
-debDir="Linux/Debian-Ubuntu"
-archDir="Linux/Archlinux"
-
 helpMe="$(cat <<EOF
 Usage: install [OPTION]...
 Usage: install <distro> [-p <password>] [-y]
 
 Options:
-	--debian			Install for Debian based distros.
-	--arch				Install for Arch based distros.
+	--root				Install for Debian based distros.
 	-y | --yes			Answer yes to all questions.
 	-p | --password		Set the password for the root user.
 	-h | --help			Show this help message.
@@ -23,47 +19,35 @@ EOF
 
 # Use case statement to check for arguments.
 while true ; do case "${1}" in
-	--debian		)
-		cp -rvf ${debDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} ~/
-	;;
-	--arch			)
-		cp -rvf ${archDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} ~/
-	;;
-	-p | --password		)
-		# Set the password for the root user and store it in a variable.
-		sudoPassword="${2}"
-	;;
-	-y | --yes		)
+	--root				 )
 
-		# Force yes to root user install.
-		forceYes="true"
-
-		# Install as root, passing the password to the sudo command if it was set.
-		if test -n "${sudoPassword}" ; then
-			echo "${sudoPassword}" | sudo -S cp -rvf ${debDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} /root/
+		# Check if the user is root.
+		if test "$(whoami)" = "root" ; then
+			# Check if the user is root.
+			echo "This script must be run as root." ; exit 1
 		else
-			sudo cvp -rvf ${debDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} /root/
+			installRoot="true" ; shift
 		fi
 	;;
-	-h | --help		)	echo "${helpMe}" ; exit 0 ;;
-esac ; shift && test -n "${1}" || break ; done
+	-y | --yes			 ) answerYes="true" ; shift ;;
+	-p | --password		 ) rootPassword="${2}" ; shift 2 ;;
+	-h | --help			 ) echo "${helpMe}" ; exit 0 ;;
+esac ; if test -z "${1}" ; then break ; fi ; done
 
-# Before exiting ask if the user wants to install the config files for the root user only if the
-# variable forceYes is not set to true.
-if test -z "${forceYes}" ; then
-	read -pr "Install for root user? [y/N] " installRoot ; case "${1}" in
-		y | Y		)
-			if test -n "${sudoPassword}" ; then
-				echo "${sudoPassword}" | sudo -S cp -rvf ${debDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} /root/
+# Copy all .* files to the home directory, but exlude the `.` and `..` directories.
+cd Linux || exit 1
+
+for file in .* ; do
+	if test "${file}" != "." && test "${file}" != ".." ; then
+		if test "${installRoot}" = "true" && test -n "${rootPassword}" ; then
+			if test "${answerYes}" = "yes" ; then
+				echo "${rootPassword}" | sudo -S cp -rvf "${file}" /root/
 			else
-				sudo cp -rvf ${debDir}/.{bashrc,config/starship.toml,less,dir_color,nanorc,profile,bash_logout} /root/
+				cp -rvf "${file}" /root/
 			fi
-		;;
-		n|N		)	echo "Not installing for root user." ;;
-		*		)	echo "Please answer yes or no." ; bash install "${@}" ;;
-	esac
-fi
-
-source ~/.bashrc
+		fi
+		cp -rvf "${file}" ~/
+	fi
+done
 
 exit 0
