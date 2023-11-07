@@ -211,7 +211,7 @@ alias omv='ssh omv'												# Access local NAS over ssh.
 
 alias sshkey='ssh-genkey'										# Generate new ssh key.
 
-eval "$(dircolors -b ~/.dir_color)"								# Set new color scheme for `ls` command.
+eval "$(dircolors -b ~/.dir_colors)"							# Set new color scheme for `ls` command.
 
 # The default bash prompt is replaced by Starship: this allows for greater prompt configuration thanks to
 # `~/.config/starship.toml`. By having the prompt being handled outside of `bash` the command histroy is
