@@ -7,4 +7,4 @@ test -n "${PS1}" && source "/usr/share/bash-completion/bash_completion" || retur
 # Check if hugo is installed, it installed add it to the path.
 test -x "$(command -v hugo)" && source <(hugo completion bash) || return
 
-test ! -f ~/.bashrc || source ~/.bashrc							# Source the ~/.bashrc file if one exits.
+test ! -f ~/.bashrc || source ~/.bashrc                         # Source the ~/.bashrc file if one exits.
