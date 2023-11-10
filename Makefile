@@ -59,7 +59,7 @@ endif
 endif
 
 
-# Install the bash profile for Linux/WSL, but for WSL do not install the fonst. Instead
+# Install the bash profile for Linux/WSL, but for WSL do not install the fonts. Instead
 # ask the user to install the font using `make font`.
 linux:
 	@echo "Installing bash profile for Linux/WSL"
@@ -93,7 +93,7 @@ endif
 	@mkdir -pv $(HOME)/.config
 	@cp -vf $(STARSHIP_FILES) $(HOME)/.config/starship.toml
 
-# Istall Starship prompt.
+# Install Starship prompt.
 
 ifeq ($(shell whoami), root)
 	@echo "Installing starship prompt"
