@@ -2,30 +2,14 @@
 # possible to pick any color, staying close to the default is best.
 
 # Match the list below xterm's that can be colorized.
-TERM Eterm
-TERM ansi
-TERM *color*
-TERM con[0-9]*x[0-9]*
-TERM cons25
-TERM console
-TERM cygwin
-TERM dtterm
-TERM gnome
-TERM hurd
-TERM jfbterm
-TERM konsole
-TERM kterm
-TERM linux
-TERM linux-c
-TERM mlterm
-TERM putty
-TERM rxvt*
-TERM screen*
-TERM st
-TERM terminator
-TERM tmux*
-TERM vt100
-TERM xterm*
+TERM Eterm ansi *color* cons25 con[0-9]*x[0-9]* *-r[xr]xterm* gnome konsole kterm rxvt* mlterm xterm* putty st rxvt
+TERM rxvt-unicode rxvt-256color rxvt-88color rxvt-unicode-256color xterm-256color xterm-88color xterm-color xterm
+TERM screen screen-256color screen-256color-bce screen-256color-bce-s screen-bce screen-s screen-w screen.linux
+TERM tmux tmux-256color tmux-88color tmux-color tmux-256color-bce tmux-256color-bce-s tmux-bce tmux-s tmux-w
+TERM cygwin mintty
+
+# Add Windows Terminal to the list.
+TERM Windows-
 
 # The list of colors used below using 256 bit color and text effects. However bold '01' is overridden
 # do to the fact that that the text is always bold while both 256 color and RGB is used; but everything
@@ -41,143 +25,50 @@ TERM xterm*
 # LightSkyBlue3    = 109    OrangeRed1        = 202     Cornsilk1     = 230
 # DarkViolet       = 127    HotPink           = 206     Grey50        = 244
 
-RESET 0					# reset to "normal" color
-FILE 38;5;189				# regular file: use no color at all
-DIR 38;5;63				# directory
-LINK 38;5;109				# symbolic link. (If you set this to 'target' instead of a
-					# numerical value, the color is as for the file pointed to).
-MULTIHARDLINK 38;5;109;4		# regular file with more than one link
-FIFO 38;5;208 				# pipe
-SOCK 38;5;127				# socket
-DOOR 38;5;127				# door
-BLK 38;5;178				# block device driver
-CHR 38;5;178				# character device driver
-ORPHAN 38;5;189;2;9			# symlink to nonexistent file, or non-stat'able file ...
-MISSING 38;5;189;2;9			# ... and the files they point to
-SETUID 48;5;202;38;5;189		# file that is setuid (u+s)
-SETGID 48;5;178;38;5;189		# file that is setgid (g+s)
-CAPABILITY 38;5;78;7			# file with capability
-STICKY 48;5;63;38;5;189 		# dir with the sticky bit set (+t) and not other-writable
-OTHER_WRITABLE 38;5;109;7 		# dir that is other-writable (o+w) and not sticky
-STICKY_OTHER_WRITABLE 38;5;109;7	# dir that is sticky and other-writable (+t,o+w)
+RESET 0															# reset to "normal" color
+FILE 38;5;189													# regular file: use no color at all
+DIR 38;5;63														# directory
+LINK 38;5;109													# symbolic link. (If you set this to 'target' instead of a
+																# numerical value, the color is as for the file pointed to).
 
-EXEC 38;5;78				# This is for files with execute permission:
+MULTIHARDLINK 38;5;109;4										# regular file with more than one link
+FIFO 38;5;208 													# pipe
+SOCK 38;5;127													# socket
+DOOR 38;5;127													# door
+BLK 38;5;178													# block device driver
+CHR 38;5;178													# character device driver
+ORPHAN 38;5;189;2;9												# symlink to nonexistent file, or non-stat'able file ...
+MISSING 38;5;189;2;9											# ... and the files they point to
+SETUID 48;5;202;38;5;189										# file that is setuid (u+s)
+SETGID 48;5;178;38;5;189										# file that is setgid (g+s)
+CAPABILITY 38;5;78;7											# file with capability
+STICKY 48;5;63;38;5;189 										# dir with the sticky bit set (+t) and not other-writable
+OTHER_WRITABLE 38;5;109;7 										# dir that is other-writable (o+w) and not sticky
+STICKY_OTHER_WRITABLE 38;5;109;7								# dir that is sticky and other-writable (+t,o+w)
+
+EXEC 38;5;78													# This is for files with execute permission:
 
 # Windows executable files can be listed here if you wish, but since Windows is not the focus they are omitted.
 
 # archives or compressed are pink.
-.tar 38;5;206
-.tgz 38;5;206
-.arc 38;5;206
-.arj 38;5;206
-.taz 38;5;206
-.lha 38;5;206
-.lz4 38;5;206
-.lzh 38;5;206
-.lzma 38;5;206
-.tlz 38;5;206
-.txz 38;5;206
-.tzo 38;5;206
-.t7z 38;5;206
-.zip 38;5;206
-.z 38;5;206
-.dz 38;5;206
-.gz 38;5;206
-.lrz 38;5;206
-.lz 38;5;206
-.lzo 38;5;206
-.xz 38;5;206
-.zst 38;5;206
-.tzst 38;5;206
-.bz2 38;5;206
-.bz 38;5;206
-.tbz 38;5;206
-.tbz2 38;5;206
-.tz 38;5;206
-.deb 38;5;206
-.rpm 38;5;206
-.jar 38;5;206
-.war 38;5;206
-.ear 38;5;206
-.sar 38;5;206
-.rar 38;5;206
-.alz 38;5;206
-.ace 38;5;206
-.zoo 38;5;206
-.cpio 38;5;206
-.7z 38;5;206
-.rz 38;5;206
-.cab 38;5;206
-.wim 38;5;206
-.swm 38;5;206
-.dwm 38;5;206
-.esd 38;5;206
+.tar 38;5;206	.tgz 38;5;206	.arc 38;5;206	.arj 38;5;206	.taz 38;5;206	.lha 38;5;206	.lz4 38;5;206
+.lzh 38;5;206	.lzma 38;5;206	.tlz 38;5;206	.txz 38;5;206	.tzo 38;5;206	.t7z 38;5;206	.zip 38;5;206
+.z 38;5;206		.dz 38;5;206	.gz 38;5;206	.lrz 38;5;206	.lz 38;5;206	.lzo 38;5;206	.xz 38;5;206
+.zst 38;5;206	.tzst 38;5;206	.bz2 38;5;206	.bz 38;5;206	.tbz 38;5;206	.tbz2 38;5;206	.tz 38;5;206
+.deb 38;5;206	.rpm 38;5;206	.jar 38;5;206	.war 38;5;206	.ear 38;5;206	.sar 38;5;206	.rar 38;5;206
+.alz 38;5;206	.ace 38;5;206	.zoo 38;5;206	.cpio 38;5;206	.7z 38;5;206	.rz 38;5;206	.cab 38;5;206
+.wim 38;5;206	.swm 38;5;206	.dwm 38;5;206	.esd 38;5;206
 
-# Common Image and video file types by extention.
-.jpg 38;5;202
-.jpeg 38;5;202
-.mjpg 38;5;202
-.mjpeg 38;5;202
-.gif 38;5;202
-.bmp 38;5;202
-.pbm 38;5;202
-.pgm 38;5;202
-.ppm 38;5;202
-.tga 38;5;202
-.xbm 38;5;202
-.xpm 38;5;202
-.tif 38;5;202
-.tiff 38;5;202
-.png 38;5;202
-.svg 38;5;202
-.svgz 38;5;202
-.mng 38;5;202
-.pcx 38;5;202
-.mov 38;5;202
-.mpg 38;5;202
-.mpeg 38;5;202
-.m2v 38;5;202
-.mkv 38;5;202
-.webm 38;5;202
-.ogm 38;5;202
-.mp4 38;5;202
-.m4v 38;5;202
-.mp4v 38;5;202
-.vob 38;5;202
-.qt 38;5;202
-.nuv 38;5;202
-.wmv 38;5;202
-.asf 38;5;202
-.rm 38;5;202
-.rmvb 38;5;202
-.flc 38;5;202
-.avi 38;5;202
-.fli 38;5;202
-.flv 38;5;202
-.gl 38;5;202
-.dl 38;5;202
-.xcf 38;5;202
-.xwd 38;5;202
-.yuv 38;5;202
-.cgm 38;5;202
-.emf 38;5;202
-.ogv 38;5;202
-.ogx 38;5;202
+# Image and video files are orange.
+.jpg 38;5;202	.jpeg 38;5;202	.mjpg 38;5;202	.mjpeg 38;5;202	.gif 38;5;202	.bmp 38;5;202	.pbm 38;5;202
+.pgm 38;5;202	.ppm 38;5;202	.tga 38;5;202	.xbm 38;5;202	.xpm 38;5;202	.tif 38;5;202	.tiff 38;5;202
+.png 38;5;202	.svg 38;5;202	.svgz 38;5;202	.mng 38;5;202	.pcx 38;5;202	.mov 38;5;202	.mpg 38;5;202
+.mpeg 38;5;202	.m2v 38;5;202	.mkv 38;5;202	.webm 38;5;202	.ogm 38;5;202	.mp4 38;5;202	.m4v 38;5;202
+.mp4v 38;5;202	.vob 38;5;202	.qt 38;5;202	.nuv 38;5;202	.wmv 38;5;202	.asf 38;5;202	.rm 38;5;202
+.rmvb 38;5;202	.flc 38;5;202	.avi 38;5;202	.fli 38;5;202	.flv 38;5;202	.gl 38;5;202	.dl 38;5;202
+.xcf 38;5;202	.xwd 38;5;202	.yuv 38;5;202	.cgm 38;5;202	.emf 38;5;202	.ogv 38;5;202	.ogx 38;5;202
 
-# Common audio files types by extentions.
-.aac 38;5;244
-.au 38;5;244
-.flac 38;5;244
-.m4a 38;5;244
-.mid 38;5;244
-.midi 38;5;244
-.mka 38;5;244
-.mp3 38;5;244
-.mpc 38;5;244
-.ogg 38;5;244
-.ra 38;5;244
-.wav 38;5;244
-.oga 38;5;244
-.opus 38;5;244
-.spx 38;5;244
-.xspf 38;5;244
+# Audio files are grey.
+.aac 38;5;244	.au 38;5;244	.flac 38;5;244	.m4a 38;5;244	.mid 38;5;244	.midi 38;5;244	.mka 38;5;244
+.mp3 38;5;244	.mpc 38;5;244	.ogg 38;5;244	.ra 38;5;244	.wav 38;5;244	.oga 38;5;244	.opus 38;5;244
+.spx 38;5;244	.xspf 38;5;244

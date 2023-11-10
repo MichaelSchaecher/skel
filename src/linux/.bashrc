@@ -5,7 +5,7 @@
 # causes Bash Terminal to be slow.
 
 # Extract common archives with commonly used archiving tools. This is a modified function that is all
-# over the web, but better. By not using an if condistion checking if file exist before employing case
+# over the web, but better. By not using an if condition checking if file exist before employing case
 # input option there is less chance errors.
 function extract () {
 
@@ -23,53 +23,15 @@ function extract () {
 		*.zip				)	unzip "${1}"					;;
 		*.7z				)	7z x "${1}"						;;
 		*					)
-			# Echo common error regradeless if file exists.
+			# Echo common error regardless if file exists.
 			test -f "${1}" && {
 				echo "${1} archive type or file not supported!" ; return ; }
                 ;;
 	esac
 }
 
-# This is called with the alias more command and is design to add some color to the text syntex only if
-# supported by this function.
-
-# Why some think that color output to source code syntex is only for newbies, I say that there is a reason
-# that only code has bugs not features.
-function colorLess () {
-
-	local ccpSource srcSource pySource iniSource mkSource
-
-	ccpSource="*[ch]|[ch]pp|[ch]xx|[ch]++|cc|hh|CPP|C|H|*cp"
-	srcSource="profile|bash_*|sh|ksh|bash|ebuild|eclass|bashrc|exheres-0|exlib|zsh|zshrc"
-	pySource="py|pyw|sc|tac|sage"
-	iniSource="in|config|conf|cnf|fstab"
-	mkSource="mk|mak|Makefile|makefile"
-
-	# Determend with language syntex is being color coded.
-	case "$(echo "${1}" | awk -F'.' 'NF>1{print $NF}')" in
-		"${ccpSource}"		) local addColor="cpp"	;;
-		"${srcSource}"		) local addColor="bash"	;;
-		"${pySource}"		) local addColor="py"   ;;
-		"${iniSource}"		) local addColor="ini"  ;;
-		"${mkSource}"		) local addColor="make" ;;
-		md					) local addColor="md"   ;;
-		toml				) local addColor="toml" ;;
-		dir_color			) local addColor="ruby"	;;
-		*)
-			# For files that do not have a file extension then try some other way to get the
-			# file type. Warning this may fail with some files.
-			if awk 'NR==1 {print}' "${1}" | grep -q 'bash' ; then
-				local addColor="bash"
-			elif awk 'NR==1 {print}' "${1}" | grep -q 'python' ; then
-				local addColor="py"
-			fi
-		;;
-	esac
-
-	# Set the syntex color or not.
-	if test -n "${addColor}" ; then pygmentize -f 256 -l "${addColor}" "$1" 2> /dev/null | less ; else less ${1} ; fi
-
-}
+# Setting the more alias to use pygmentize for syntax highlighting.
+function more () { pygmentize -f terminal256 -g "$1" | less -R; }
 
 # As a result of the prompt being Starship the command history is not process the same way. Without the
 # history being from with in this function being run pier to the command its self would cause the bash's
@@ -95,6 +57,9 @@ function histControl () {
 
 	export PROMPT_COMMAND HISTCONTROL HISTIGNORE HISTFILESIZE HISTSIZE HISTTIMEFORMAT
 
+	# Rewrite the history file, removing all duplicates preserving the most recent version of the
+	# command. This is done by reversing the order of the history file, removing duplicates, then
+	# reversing the order again to put the history file back in the correct order.
 	if test -f "${HISTFILE}" ; then
 		tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
 		tac ~/.bash_history.old > "${HISTFILE}"
@@ -119,7 +84,7 @@ GCC_COLORS="error=$RED:warning=$ORANGE:note=$BLUE:caret=$PURPLE:locus=$CYAN:quot
 # Some may laugh about using nano, but I barely use a cli text editor, so there.
 EDITOR=nano ; export EDITOR
 
-# Have less display colours for manpage.
+# Have less display colors for manpage.
 LESS_TERMCAP_mb=$(echo -e "\e[${PURPLE};3m")					# begin bold.
 LESS_TERMCAP_md=$(echo -e "\e[${PURPLE}m")						# begin blink.
 LESS_TERMCAP_so=$(echo -e "\e[${H_LIGHT};${PURPLE}m")			# begin reverse video.
@@ -130,7 +95,8 @@ LESS_TERMCAP_ue=$(echo -e "\e[0m")								# reset underline.
 
 GROFF_NO_SGR="1"												# for konsole and gnome-terminal.
 
-export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_so LESS_TERMCAP_us LESS_TERMCAP_me LESS_TERMCAP_se LESS_TERMCAP_ue GROFF_NO_SGR
+export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_so LESS_TERMCAP_us \
+	LESS_TERMCAP_me LESS_TERMCAP_se LESS_TERMCAP_ue GROFF_NO_SGR
 
 STARSHIP_LOG="error" ; export STARSHIP_LOG						# Don't show Starship warnings or errors.
 
@@ -140,21 +106,11 @@ bind '"\033[B": history-search-forward'
 
 alias gcc='gcc -fdiagnostics-color=auto'						# Add color to gcc.
 
-test "${ID_LIKE}" = "arch" && {
-alias inst='yay -S --noconfirm'                                 # Install package.
-alias uinst='yay -Rsc --noconfirm'                              # Remove/uninstall application.
-alias srch='yay -Ss'                                            # Search for application.
-alias update='yay -Syu --noconfirm'                             # Upgrade installed applications.
-alias query='yay -Qe'                                           # Query explicitly-installed packages.
-}
-
-test "${ID_LIKE}" = "debian" || test "${ID}" = "debian" && {
 alias inst='sudo apt install --yes'                             # Install package.
 alias uinst='sudo apt install --yes --autoremove'               # Remove/uninstall application.
 alias srch='apt search'                                         # Search for application.
 alias update='sudo apt update && sudo apt upgrade --yes'        # Upgrade installed applications.
 alias query='sudo apt list'                                     # Query explicitly-installed packages.
-}
 
 alias add='git add .'											# Add all changes to local git repo.
 alias new='git init'											# Initialize new local git repo.
@@ -177,7 +133,7 @@ alias repo='gh repo create'										# Create new Github repo.
 alias ls='ls -a --color=auto'									# Add color to list output.
 alias grep='grep --color=auto'									# Grep needs some color too.
 alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'								# This old but still used.
+alias egrep='egrep --color=auto'								# This is old but still used.
 
 alias mkdir='mkdir -p'											# Assume the parent directory.
 
@@ -201,15 +157,17 @@ alias gzip='gzip -9'											# Create gzip archive.
 alias zip='zip -r'												# Create zip archive.
 alias 7z='7z a'													# Create archive using 7z.
 
-alias more='colorLess'											# Call function to apply less syntex color.
-
 alias status='pihole status'									# Show pihole status
 alias report='cat /var/log/manhole.log | less'					# Print log about Pihole Management.
 
 alias pihole='ssh dns_pihole_app'								# Access dns.pihole.app over ssh.
 alias omv='ssh omv'												# Access local NAS over ssh.
 
-alias sshkey='ssh-genkey'										# Generate new ssh key.
+# Aliases to generate ssh keys with no passphrase and set file name.
+alias key='ssh-keygen -P "" -f'									# Generate ssh key without passphrase and set file name.
+alias nas='ssh truenas'											# Access local TrueNAS over ssh.
+alias router='ssh router'										# Access local router over ssh.
+alias pi='ssh docker-pi'										# Access local Raspberry Pi over ssh.
 
 eval "$(dircolors -b ~/.dir_colors)"							# Set new color scheme for `ls` command.
 
