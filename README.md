@@ -52,3 +52,10 @@ Copy-Item -Path .\src\windows\profile.ps1 -Destination $env:USERPROFILE\Document
 # Create symbolic link to the profile.ps1 file
 New-Item -Path $env:USERPROFILE\Documents\WindowsPowerShell\profile.ps1 -ItemType SymbolicLink -Value $env:USERPROFILE\Documents\PowerShell\profile.ps1
 ```
+
+Install the fonts by copying then to the `C:\Windows\Fonts` directory.
+
+```powershell
+# Copy the fonts to the Windows fonts directory
+Copy-Item -Path .\src\windows\fonts\* -Destination C:\Windows\Fonts -Force
+```
