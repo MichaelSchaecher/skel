@@ -31,7 +31,7 @@ function extract () {
 }
 
 # Setting the more alias to use pygmentize for syntax highlighting.
-function more () { pygmentize -f terminal256 -g "$1" | less -R; }
+function more () { pygmentize -f terminal256 -g "$1" | less -R ; }
 
 # As a result of the prompt being Starship the command history is not process the same way. Without the
 # history being from with in this function being run pier to the command its self would cause the bash's
@@ -63,7 +63,8 @@ function histControl () {
     if test -f "${HISTFILE}" ; then
         tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
         tac ~/.bash_history.old > "${HISTFILE}"
-        test -f ~/.bash_history.old && rm ~/.bash_history.old || return
+
+        if test -f ~/.bash_history.old ; then rm ~/.bash_history.old ; fi
     fi
 
 }
@@ -71,8 +72,7 @@ function histControl () {
 # Enable some useful feature that makes `bash` more like `zsh` then people think.
 shopt -s checkwinsize ; shopt -s autocd     ; shopt -s cdspell ; shopt -s extglob ;
 
-# Manage bash history.
-shopt -s histappend   ; shopt -s cmdhist ; shopt -s lithist
+shopt -s histappend   ; shopt -s cmdhist ; shopt -s lithist     # Manage bash history.
 
 # Set ASCII 256bit color.
 BLUE="38;5;63"    ; CYAN="38;5;109" ; GREEN="38;5;78"  ; ORANGE="38;5;208"
@@ -93,16 +93,15 @@ LESS_TERMCAP_me=$(echo -e "\e[0m")                              # reset bold/bli
 LESS_TERMCAP_se=$(echo -e "\e[0m")                              # reset reverse video.
 LESS_TERMCAP_ue=$(echo -e "\e[0m")                              # reset underline.
 
-GROFF_NO_SGR="1"                                                # for konsole and gnome-terminal.
+export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_so \
+    LESS_TERMCAP_us LESS_TERMCAP_me LESS_TERMCAP_se LESS_TERMCAP_ue
 
-export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_so LESS_TERMCAP_us \
-    LESS_TERMCAP_me LESS_TERMCAP_se LESS_TERMCAP_ue GROFF_NO_SGR
+GROFF_NO_SGR="1" ; export GROFF_NO_SGR                          # for konsole and gnome-terminal.
 
 STARSHIP_LOG="error" ; export STARSHIP_LOG                      # Don't show Starship warnings or errors.
 
 # If `shopt -s histappend` is Then allow the history to be search if using similar command.
-bind '"\033[A": history-search-backward'
-bind '"\033[B": history-search-forward'
+bind '"\033[A": history-search-backward' ; bind '"\033[B": history-search-forward'
 
 alias gcc='gcc -fdiagnostics-color=auto'                        # Add color to gcc.
 
@@ -141,13 +140,13 @@ alias back='../'                                                # Go back one di
 alias home='~'                                                  # Go to user home directory.
 
 # Aliases for source projects.
-alias kernel='Projects/linux-kernel'                            # Kernel source.
-alias webpage='Project/MichaelSchaecher.github.io'              # Github webpage Source.
+alias website='/usr/local/share/srv/website'                    # Go to website directory.
+alias skel='/usr/local/share/srv/skel'                          # Go to skel directory.
 
-alias rm='rm -f'                                                # Force removal.
-alias mv='mv -f'                                                # Force move.
+alias rm='rm -vf'                                               # Force removal and verbose.
+alias mv='mv -vf'                                               # Force move and verbose.
 
-alias ln='ln -f'                                                # Always force creating a soft/hard link.
+alias ln='ln -vf'                                               # Always force creating of links and verbose.
 
 alias xz='tar cvf'                                              # Create tar.xz archive.
 alias gz='tar cvjf'                                             # Create tar.gz archive
@@ -168,6 +167,12 @@ alias key='ssh-keygen -P "" -f'                                 # Generate ssh k
 alias nas='ssh truenas'                                         # Access local TrueNAS over ssh.
 alias router='ssh router'                                       # Access local router over ssh.
 alias pi='ssh docker-pi'                                        # Access local Raspberry Pi over ssh.
+
+alias nano='nano -c'                                            # Set nano to show cursor position.
+
+alias server='hugo server --noHTTPCache --buildDrafts'          # Start Hugo server with no cache and build drafts.
+alias site='hugo new site --format yaml'                        # Create new Hugo site.
+alias content='hugo new content'                                # Create new Hugo content.
 
 eval "$(dircolors -b ~/.dir_colors)"                            # Set new color scheme for `ls` command.
 
