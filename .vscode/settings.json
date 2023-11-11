@@ -3,7 +3,8 @@
         "SC2148",
         "SC2034",
         "SC1090",
-        "SC1091"
+        "SC1091",
+        "SC2116"
     ],
     "editor.fontFamily": "'FiraMono Nerd Font','Droid Sans Mono', 'monospace', monospace",
     "cSpell.enableFiletypes": [
@@ -47,7 +48,13 @@
         "editor.tabSize": 4,
         "editor.formatOnSave": false,
     },
-    "editor.tabSize": 2,
+    "[shellscript]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.formatOnSave": false
+    },
+    "editor.tabSize": 4,
     "editor.insertSpaces": true,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

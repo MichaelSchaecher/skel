@@ -20,22 +20,35 @@ To install for both Linux and Windows, make needs to installed. On Windows via `
 
 ### Linux
 
-To install the bash configuration files and Starship Prompt with the custom config, run the following command:
-
-```bash
-make linux
-```
-
-> NOTE: To install Starship Prompt you will need root access. Otherwise the only thing that will be installed is the bash configuration files for local user.
-
-```bash
-sudo make linux
-```
+It is recommended to install the Starship Prompt globally that is why running `make install` will not install the fonts nor Starship Prompt. To install the full configuration run `sudo make install`.
 
 ### Windows
 
-To install the bash configuration files and Starship Prompt with the custom config, run the following command:
+To setup Starship Prompt on Windows you need to manually copy the `starship.toml` and `profile.ps1` files. Don't forget to create the directories first.
 
 ```powershell
-make windows
+# Create the Starship Prompt config directory
+New-Item -Path $env:USERPROFILE\.config\starship -ItemType Directory -Force
+```
+
+```powershell
+# Copy the starship.toml file to the Starship Prompt config directory
+Copy-Item -Path .\src\windows\starship.toml -Destination $env:USERPROFILE\.config\starship.toml
+```
+
+Copy the `profile.ps1` file to the PowerShell profile directory, create the directory first and then create symbolic link to the `profile.ps1` file.
+
+```powershell
+# Create the PowerShell profile directory
+New-Item -Path $env:USERPROFILE\Documents\WindowsPowerShell -ItemType Directory -Force
+```
+
+```powershell
+# Copy the profile.ps1 file to the PowerShell profile directory
+Copy-Item -Path .\src\windows\profile.ps1 -Destination $env:USERPROFILE\Documents\PowerShell\profile.ps1
+```
+
+```powershell
+# Create symbolic link to the profile.ps1 file
+New-Item -Path $env:USERPROFILE\Documents\WindowsPowerShell\profile.ps1 -ItemType SymbolicLink -Value $env:USERPROFILE\Documents\PowerShell\profile.ps1
 ```
