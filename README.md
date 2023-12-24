@@ -1,61 +1,130 @@
 <!-- Use html element to display title and what the repo is about. -->
-<div>
-    <h1 align="center">Starship Prompt Config</h1>
-    <p align="center">A custom config for the Starship Prompt.</p>
+<div align="center" >
+    <h1 style="color: rgb(175,50,100); font-size: 3em; font-weight: bold;">
+        Dot Files</h1>
+    <h3>
+        <strong>My custom dot files for Debian/Ubuntu and Windows using Starship Prompt</strong>
+    </h3>
 </div>
+
+- [About](#about)
+  - [Debian/Ubuntu Features](#debianubuntu-features)
+  - [Windows Features](#windows-features)
+- [Installation](#installation)
+  - [Debian/Ubuntu](#debianubuntu)
+    - [Install the fonts Linux](#install-the-fonts-linux)
+  - [Windows](#windows)
+    - [Install the fonts Windows](#install-the-fonts-windows)
 
 ## About
 
-This is a my custom config for the [Starship Prompt](https://starship.rs/). I've disabled most of the modules for displaying information about source control. I find that to much info is pointless and I should already know what source control I'm working with anyways.
+This is my custom dot files for Debian/Ubuntu and Windows using [Starship Prompt](https://starship.rs/). I use this dot files to make my life easier when I need to setup a new machine or reinstall my OS. I use [Starship Prompt](https://starship.rs/) because it's fast, customizable and easy to use.
 
-### Features
+### Debian/Ubuntu Features
 
-- FiraCode Nerd Font Mono
-- Custom bashrc, profile and dir_colors
-- Custom Starship Prompt toml config
+- [x] [Starship Prompt](https://starship.rs/)
+- [x] [bash](https://www.gnu.org/software/bash/)
+- [x] Custom aliases
+- [x] Custom functions
+- [x] Scrollable history with arrow keys (Up and Down)
+- [x] Command history completion with Tab
+- [x] Previous command search with arrow keys (Up and Down)
+- [x] Hugo Static Site Generator integration
+
+### Windows Features
+
+- [x] [Starship Prompt](https://starship.rs/)
+- [x] [PowerShell](https://docs.microsoft.com/en-us/powershell/)
+- [x] Custom aliases
+- [x] Custom functions for a more Linux-like experience
 
 ## Installation
 
-To install for both Linux and Windows, make needs to installed. On Windows via `winget install "GnuWin32.Make"` and for Debian/Ubuntu via `sudo apt install -y build-essential`.
+### Debian/Ubuntu
 
-### Linux
+#### Install the fonts Linux
 
-It is recommended to install the Starship Prompt globally that is why running `make install` will not install the fonts nor Starship Prompt. To install the full configuration run `sudo make install`.
+```bash
+sudo mkdir -v /usr/local/share/fonts/FiraCode
+sudo cp -v src/fonts/FiraCode/* /usr/local/share/fonts/FiraCode/
+sudo fc-cache -fv
+```
+
+Install [Starship Prompt](https://starship.rs/) with the following command: `curl -fsSL https://starship.rs/install.sh |sudo sh -s -- --yes`. This will install Starship Prompt in `/usr/local/bin/starship`. Now clone this repository and copy the files to your home, /etc/skel and /root directories with the following commands:
+
+```bash
+git clone https://github.com/MichaelSchaecher/skell
+cd skel
+```
+
+Copy the files to your home directory with the following command:
+
+```bash
+# Copy files to home directory
+
+cp -av src/linux/._ ~/
+cp -av src/linux/._ /etc/skel/
+cp -av src/linux/.\* /root/
+cp -av src/starship.toml ~/.config/
+```
+
+If copying the startship.toml file to ~/.config/ doesn't work, you may need to create the directory first with the following command: `mkdir -p ~/.config/`. Now you can copy the starship.toml file to ~/.config/ with the following command: `cp -av src/starship.toml ~/.config/`.
+
+Check out the new shell: `source ~/.bashrc` and finish the installation.
+
+Copy the files to /etc/skel and /root directories with the following commands:
+
+```bash
+sudo mkdir -v /{etc/skel,root}/.config
+sudo cp -v src/starship.toml /{etc/skel,root}/.config/
+sudo cp -v src/linux/.* /{etc/skel,root}/
+```
 
 ### Windows
 
-To setup Starship Prompt on Windows you need to manually copy the `starship.toml` and `profile.ps1` files. Don't forget to create the directories first.
+#### Install the fonts Windows
 
-```powershell
-# Create the Starship Prompt config directory
-New-Item -Path $env:USERPROFILE\.config\starship -ItemType Directory -Force
+```powershel
+Copy-Item -Path src\fonts\FiraCode\* -Destination C:\Windows\Fonts\ -Recurse -Force
 ```
 
+You may need to reopen PowerShell as an administrator to install the fonts.
+
+Open PowerShell and install [Starship Prompt](https://starship.rs/) and git with winget:
+
 ```powershell
-# Copy the starship.toml file to the Starship Prompt config directory
-Copy-Item -Path .\src\windows\starship.toml -Destination $env:USERPROFILE\.config\starship.toml
+winget install --accept-package-agreements  --accept-package-agreements "Starship.Starship"
+winget install --accept-package-agreements  --accept-package-agreements "Git.Git"
 ```
 
-Copy the `profile.ps1` file to the PowerShell profile directory, create the directory first and then create symbolic link to the `profile.ps1` file.
+Clone this repository and copy the files to your home directory with the following commands:
 
 ```powershell
-# Create the PowerShell profile directory
-New-Item -Path $env:USERPROFILE\Documents\WindowsPowerShell -ItemType Directory -Force
+git clone https://github.com/MichaelSchaecher/skell
+cd skel
 ```
 
+Copy the files to your home directory with the following PowerShell command:
+
 ```powershell
-# Copy the profile.ps1 file to the PowerShell profile directory
-Copy-Item -Path .\src\windows\profile.ps1 -Destination $env:USERPROFILE\Documents\PowerShell\profile.ps1
+Copy-Item -Path src\windows\* -Destination $HOME\Documents\Powershell\ -Recurse -Force
 ```
 
+You may need to create the powershell directory first with the following PowerShell command: `New-Item -Path $HOME\Documents\Powershell\ -ItemType Directory`. Now you can copy the files to your home directory with the following PowerShell command: `Copy-Item -Path src\windows\* -Destination $HOME\Documents\Powershell\ -Recurse -Force`. If you are still using PowerShell 5.1, then do the following:
+
 ```powershell
-# Create symbolic link to the profile.ps1 file
-New-Item -Path $env:USERPROFILE\Documents\WindowsPowerShell\profile.ps1 -ItemType SymbolicLink -Value $env:USERPROFILE\Documents\PowerShell\profile.ps1
+Copy-Item -Path src\windows\* -Destination $HOME\Documents\WindowsPowerShell\ -Recurse -Force
 ```
 
-Install the fonts by copying then to the `C:\Windows\Fonts` directory.
+Create and `.config` directory in your home directory and copy the starship.toml file to it with the following PowerShell commands:
 
 ```powershell
-# Copy the fonts to the Windows fonts directory
-Copy-Item -Path .\src\windows\fonts\* -Destination C:\Windows\Fonts -Force
+New-Item -Path $HOME\.config -ItemType Directory
+Copy-Item -Path src\starship.toml -Destination $HOME\.config\ -Force
+```
+
+Reload your PowerShell profile with the following command:
+
+```powershell
+. $HOME\Documents\PowerShell\profile.ps1
 ```

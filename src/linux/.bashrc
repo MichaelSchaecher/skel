@@ -1,18 +1,28 @@
-# ~/.bashrc
+# ~/.bashrc : executed by bash(1) for login shells.
 
-# By default the .bashrc file is loaded after ~/.bash_profile, ~/.bash_login or ~/.profile, because
-# of this ~/.bashrc file needs to be pretty large. This can be problematic if plugins are used and
-# causes Bash Terminal to be slow.
+# Normally this file is executed and sourced by the ~/.bashrc file. However, I think that is dumb. So instead
+# the `~/.profile` is loaded as the only file.
 
-# Extract common archives with commonly used archiving tools. This is a modified function that is all
-# over the web, but better. By not using an if condition checking if file exist before employing case
-# input option there is less chance errors.
-function extract () {
+# Set of functions to be used.
 
-    local outDir
+# Extract an archive file.
 
-    outDir="$(echo "${1}" | awk -F'.' '{print $1}')"            # Set out directory from source.
+# Setting the more alias to use pygmentize for syntax highlighting.
+function more () {
 
+    # Check if pygmentize is installed and use it for syntax highlighting if it is. If not use the default
+    # less command.
+    test -x "$(command -v pygmentize)" && pygmentize -f terminal256 -g "$1" | less -R || less "$1"
+
+    return
+}
+
+function xtract () {
+
+    # Set the default output directory based on the file name without the extension.
+    local outDir ; outDir="(echo "${1}" | awk '{print ${1}')"
+
+    # Use case menu.
     case "${1}" in
         *.tar.bz2|*.tbz2    )    tar xvjf "${1}" -C "${outDir}"  ;;
         *.tar.gz|*.tgz      )    tar xvzf "${1}" -C "${outDir}"  ;;
@@ -28,26 +38,20 @@ function extract () {
                 echo "${1} archive type or file not supported!" ; return ; }
                 ;;
     esac
+
 }
 
-# Setting the more alias to use pygmentize for syntax highlighting.
-function more () { pygmentize -f terminal256 -g "$1" | less -R ; }
-
-# As a result of the prompt being Starship the command history is not process the same way. Without the
-# history being from with in this function being run pier to the command its self would cause the bash's
-# history file would be populated incorrectly or not at all.
+# This bash profile uses Starship as the prompt, as a result the bash history needs the handled differently.
 function histControl () {
 
-    # The `starship_precmd` is the default PROMPT_COMMAND for `starship.`
+    # Use the default `starship_precmd` with history -w to write the history to the history file.
     PROMPT_COMMAND="starship_precmd; history -w"
 
-    # Manage the history for the environment. Don't put duplicate lines or lines starting with space
-    # in the history.
-    # Then erase previous matching command. See bash(1) for more options.
-    HISTCONTROL='ignoredups:ignorespace:erasedups'
+    # Ignore duplicate commands and commands that start with a space.
+    HISTCONTROL="ignoreboth"
 
-    # Ignore the following to keep bash_history from being over populated.
-    HISTIGNORE='ls:cd:pwd:history:clear:back:home:exit:source'
+    # Ignore the following commonly used commands.
+    HISTIGNORE="&:ls:[bf]g:exit:clear:history:pwd:cd:source"
 
     # A Larger history file size would is better.
     HISTFILESIZE="100000" ; export  HISTSIZE="1000000"
@@ -60,19 +64,38 @@ function histControl () {
     # Rewrite the history file, removing all duplicates preserving the most recent version of the
     # command. This is done by reversing the order of the history file, removing duplicates, then
     # reversing the order again to put the history file back in the correct order.
-    if test -f "${HISTFILE}" ; then
-        tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
-        tac ~/.bash_history.old > "${HISTFILE}"
+    tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
+    tac ~/.bash_history.old > "${HISTFILE}"
 
-        if test -f ~/.bash_history.old ; then rm ~/.bash_history.old ; fi
-    fi
+    # Remove the temporary history file.
+    test ! -f ~/.bash_history.old || rm ~/.bash_history.old > /dev/null 2>&1
 
 }
+
+# Make sure the shell is interactive by checking if the variable `PS1` is set. This needs to be done ever
+# though the `bash prompt` is not used. If everything checkouts enable bash completion if not enabled
+test ! -n "${PS1}" || source "/usr/share/bash-completion/bash_completion"
+
+# Check if hugo is installed, it installed add it to the path.
+test ! -x "$(command -v hugo)" || source <(hugo completion bash)
 
 # Enable some useful feature that makes `bash` more like `zsh` then people think.
 shopt -s checkwinsize ; shopt -s autocd     ; shopt -s cdspell ; shopt -s extglob ;
 
 shopt -s histappend   ; shopt -s cmdhist ; shopt -s lithist     # Manage bash history.
+
+# If `shopt -s histappend` is Then allow the history to be search if using similar command.
+bind '"\033[A": history-search-backward' ; bind '"\033[B": history-search-forward'
+
+source "/usr/share/bash-completion/bash_completion"             # Enable bash completion.
+
+# Check if hugo is installed, it installed add it to the path.
+test ! -x "$(command -v hugo)" || source <(hugo completion bash)
+
+eval "$(dircolors -b ~/.dir_colors)"                            # Set new color scheme for `ls` command.
+
+# Shellcheck disable=SC2034
+starship_precmd_user_func="histControl"                         # Manage the bash history.
 
 # Set ASCII 256bit color.
 BLUE="38;5;63"    ; CYAN="38;5;109" ; GREEN="38;5;78"  ; ORANGE="38;5;208"
@@ -100,13 +123,10 @@ GROFF_NO_SGR="1" ; export GROFF_NO_SGR                          # for konsole an
 
 STARSHIP_LOG="error" ; export STARSHIP_LOG                      # Don't show Starship warnings or errors.
 
-# If `shopt -s histappend` is Then allow the history to be search if using similar command.
-bind '"\033[A": history-search-backward' ; bind '"\033[B": history-search-forward'
-
 alias gcc='gcc -fdiagnostics-color=auto'                        # Add color to gcc.
 
 alias inst='sudo apt install --yes'                             # Install package.
-alias uinst='sudo apt install --yes --autoremove'               # Remove/uninstall application.
+alias uinst='sudo apt purge --yes --autoremove'                 # Remove/uninstall application.
 alias srch='apt search'                                         # Search for application.
 alias update='sudo apt update && sudo apt upgrade --yes'        # Upgrade installed applications.
 alias query='sudo apt list'                                     # Query explicitly-installed packages.
@@ -136,17 +156,14 @@ alias egrep='egrep --color=auto'                                # This is old bu
 
 alias mkdir='mkdir -p'                                          # Assume the parent directory.
 
-alias back='../'                                                # Go back one directory.
-alias home='~'                                                  # Go to user home directory.
-
-# Aliases for source projects.
-alias website='/usr/local/share/srv/website'                    # Go to website directory.
-alias skel='/usr/local/share/srv/skel'                          # Go to skel directory.
-
-alias rm='rm -vf'                                               # Force removal and verbose.
+alias rm='rm -v'                                                # Force removal and verbose.
 alias mv='mv -vf'                                               # Force move and verbose.
 
 alias ln='ln -vf'                                               # Always force creating of links and verbose.
+
+alias df='df -h'                                                # Show disk usage in human readable format.
+
+alias cp='cp -a'                                                # Copy files and directories recursively.
 
 alias xz='tar cvf'                                              # Create tar.xz archive.
 alias gz='tar cvjf'                                             # Create tar.gz archive
@@ -156,30 +173,38 @@ alias gzip='gzip -9'                                            # Create gzip ar
 alias zip='zip -r'                                              # Create zip archive.
 alias 7z='7z a'                                                 # Create archive using 7z.
 
-alias status='pihole status'                                    # Show pihole status
-alias report='cat /var/log/manhole.log | less'                  # Print log about Pihole Management.
+# alias status='pihole status'                                    # Show pihole status
+# alias report='cat /var/log/manhole.log | less'                  # Print log about Pihole Management.
 
-alias pihole='ssh dns_pihole_app'                               # Access dns.pihole.app over ssh.
-alias omv='ssh omv'                                             # Access local NAS over ssh.
-
-# Aliases to generate ssh keys with no passphrase and set file name.
 alias key='ssh-keygen -P "" -f'                                 # Generate ssh key without passphrase and set file name.
+alias copy='ssh-copy-id -i'                                     # Copy ssh key to remote server.
+
+alias back='../'                                                # Go back one directory.
+alias home='~'                                                  # Go to user home directory.
+
 alias nas='ssh truenas'                                         # Access local TrueNAS over ssh.
 alias router='ssh router'                                       # Access local router over ssh.
+alias pihole='ssh pihole'                                       # Access local Pihole over ssh.
+alias prox='ssh proxmox'                                        # Access local Proxmox over ssh.
+
 alias pi='ssh docker-pi'                                        # Access local Raspberry Pi over ssh.
 
 alias nano='nano -c'                                            # Set nano to show cursor position.
 
-alias server='hugo server --noHTTPCache --buildDrafts'          # Start Hugo server with no cache and build drafts.
+alias free='free -h'                                            # Show free memory in human readable format.
+
+# Aliases for source projects.
+alias website='code ~/Projects/website'                         # Go to website project.
+alias theme='code ~/Projects/simple-dark'                       # Go to theme project.
+alias skel='code ~/Projects/skel'                               # Go to skel project.
+alias profile='code ~/Projects/MichaelSchaecher'                # Go to Github profile.
+
+# Start Hugo server with no cache and build drafts.
+alias server='hugo server --noHTTPCache --buildDrafts  --disableFastRender'
+
 alias site='hugo new site --format yaml'                        # Create new Hugo site.
 alias content='hugo new content'                                # Create new Hugo content.
 
-eval "$(dircolors -b ~/.dir_colors)"                            # Set new color scheme for `ls` command.
+alias reload='source ~/.profile'                                # Reload ~/.profile file.
 
-# The default bash prompt is replaced by Starship: this allows for greater prompt configuration thanks to
-# `~/.config/starship.toml`. By having the prompt being handled outside of `bash` the command histroy is
-# not populated correctly. A workaround is to rebuild the ~/.bash_history after every command is completed.
-
-# Shellcheck disable=SC2034
-starship_precmd_user_func="histControl"                         # Manage the bash history.
 eval "$(starship init bash)"                                    # Start Starship Prompt.

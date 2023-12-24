@@ -121,6 +121,8 @@ function stop-wsl () { wsl -shutdown }                          # Shutdown wsl s
 
 function quiet-wsl ($name) { wsl --terminate $name }            # Quiet a running wsl distro.
 
+function reload () { . $HOME\Documents\PowerShell\profile.ps1 } # Reload PowerShell profile.
+
 $distroLocation = 'D:\distributions\'
 
 function emport-distro ($name, $directory, $location) {
