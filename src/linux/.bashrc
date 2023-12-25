@@ -138,6 +138,9 @@ alias tag='git tag -a'                                          # Create git tag
 alias delete='git branch -D'                                    # Delete git branch.
 alias checkout='git checkout -b'                                # Create new git repo branch.
 alias merge='git merge'                                         # Merge git repo.
+alias pat='git checkout --patch'                                # Patch git repo.
+alias sub='git submodule add'                                   # Add git submodule.
+alias upsub='git submodule update --recursive --remote'         # Update git submodule.
 alias commit='git commit -m'                                    # Commit changes with message.
 alias push='git push origin $(git describe --abbrev=0)'         # Push current tag to remote.
 alias github='git push origin $(git symbolic-ref --short HEAD)' # Push current branch to remote.
