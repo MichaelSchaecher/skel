@@ -195,14 +195,10 @@ alias gzip='gzip -9'                                                # Create gzi
 alias zip='zip -r'                                                  # Create zip archive.
 alias 7z='7z a'                                                     # Create archive using 7z.
 
-# alias status='pihole status'                                      # Show pihole status
-# alias report='cat /var/log/manhole.log | less'                    # Print log about Pihole Management.
+test ! -x $(command -v pihole) || alias status='pihole status'      # Show pihole status
 
 alias key='ssh-keygen -P "" -f'                                     # Generate no passphrase ssh key.
 alias csk='ssh-copy-id -i'                                          # Copy ssh key to remote server.
-
-alias back='../'                                                    # Go back one directory.
-alias home='~'                                                      # Go to user home directory.
 
 alias nas='ssh truenas'                                             # Access local TrueNAS over ssh.
 alias router='ssh router'                                           # Access local router over ssh.
@@ -213,6 +209,9 @@ alias pi='ssh docker-pi'                                            # Access loc
 alias nano='nano -c'                                                # Set nano to show cursor position.
 
 alias free='free -h'                                                # Show free memory in human readable format.
+
+alias back='../'                                                    # Go back one directory.
+alias home='~'                                                      # Go to user home directory.
 
 # Aliases for source projects.
 alias website='code ~/Projects/website'                             # Go to website project.
