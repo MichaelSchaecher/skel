@@ -82,20 +82,20 @@ test ! -x "$(command -v hugo)" || source <(hugo completion bash)
 # Enable some useful feature that makes `bash` more like `zsh` then people think.
 shopt -s checkwinsize ; shopt -s autocd     ; shopt -s cdspell ; shopt -s extglob ;
 
-shopt -s histappend   ; shopt -s cmdhist ; shopt -s lithist     # Manage bash history.
+shopt -s histappend   ; shopt -s cmdhist ; shopt -s lithist         # Manage bash history.
 
 # If `shopt -s histappend` is Then allow the history to be search if using similar command.
 bind '"\033[A": history-search-backward' ; bind '"\033[B": history-search-forward'
 
-source "/usr/share/bash-completion/bash_completion"             # Enable bash completion.
+source "/usr/share/bash-completion/bash_completion"                 # Enable bash completion.
 
 # Check if hugo is installed, it installed add it to the path.
 test ! -x "$(command -v hugo)" || source <(hugo completion bash)
 
-eval "$(dircolors -b ~/.dir_colors)"                            # Set new color scheme for `ls` command.
+eval "$(dircolors -b ~/.dir_colors)"                                # Set new color scheme for `ls` command.
 
 # Shellcheck disable=SC2034
-starship_precmd_user_func="histControl"                         # Manage the bash history.
+starship_precmd_user_func="histControl"                             # Manage the bash history.
 
 # Set ASCII 256bit color.
 BLUE="38;5;63"    ; CYAN="38;5;109" ; GREEN="38;5;78"  ; ORANGE="38;5;208"
@@ -108,106 +108,127 @@ GCC_COLORS="error=$RED:warning=$ORANGE:note=$BLUE:caret=$PURPLE:locus=$CYAN:quot
 EDITOR=nano ; export EDITOR
 
 # Have less display colors for manpage.
-LESS_TERMCAP_mb=$(echo -e "\e[${PURPLE};3m")                    # begin bold.
-LESS_TERMCAP_md=$(echo -e "\e[${PURPLE}m")                      # begin blink.
-LESS_TERMCAP_so=$(echo -e "\e[${H_LIGHT};${PURPLE}m")           # begin reverse video.
-LESS_TERMCAP_us=$(echo -e "\e[${LIGHT};4m")                     # begin underline.
-LESS_TERMCAP_me=$(echo -e "\e[0m")                              # reset bold/blink.
-LESS_TERMCAP_se=$(echo -e "\e[0m")                              # reset reverse video.
-LESS_TERMCAP_ue=$(echo -e "\e[0m")                              # reset underline.
+LESS_TERMCAP_mb=$(echo -e "\e[${PURPLE};3m")                        # begin bold.
+LESS_TERMCAP_md=$(echo -e "\e[${PURPLE}m")                          # begin blink.
+LESS_TERMCAP_so=$(echo -e "\e[${H_LIGHT};${PURPLE}m")               # begin reverse video.
+LESS_TERMCAP_us=$(echo -e "\e[${LIGHT};4m")                         # begin underline.
+LESS_TERMCAP_me=$(echo -e "\e[0m")                                  # reset bold/blink.
+LESS_TERMCAP_se=$(echo -e "\e[0m")                                  # reset reverse video.
+LESS_TERMCAP_ue=$(echo -e "\e[0m")                                  # reset underline.
 
 export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_so \
     LESS_TERMCAP_us LESS_TERMCAP_me LESS_TERMCAP_se LESS_TERMCAP_ue
 
-GROFF_NO_SGR="1" ; export GROFF_NO_SGR                          # for konsole and gnome-terminal.
+GROFF_NO_SGR="1" ; export GROFF_NO_SGR                              # for konsole and gnome-terminal.
 
-STARSHIP_LOG="error" ; export STARSHIP_LOG                      # Don't show Starship warnings or errors.
+STARSHIP_LOG="error" ; export STARSHIP_LOG                          # Don't show Starship warnings or errors.
 
-alias gcc='gcc -fdiagnostics-color=auto'                        # Add color to gcc.
+alias gcc='gcc -fdiagnostics-color=auto'                            # Add color to gcc.
 
-alias inst='sudo apt install --yes'                             # Install package.
-alias uinst='sudo apt purge --yes --autoremove'                 # Remove/uninstall application.
-alias srch='apt search'                                         # Search for application.
-alias update='sudo apt update && sudo apt upgrade --yes'        # Upgrade installed applications.
-alias query='sudo apt list'                                     # Query explicitly-installed packages.
+# Check if Linux distro is Debian/Ubuntu or Arch Linux.
+if test -x "$(command -v apt)" ; then
+    alias update='sudo apt update && sudo apt upgrade --yes'        # Upgrade installed applications.
+    alias query='sudo apt list'                                     # Query explicitly-installed packages.
+    alias inst='sudo apt install --yes'                             # Install package.
+    alias uinst='sudo apt purge --yes --autoremove'                 # Remove/uninstall application.
+    alias srch='apt search'                                         # Search for application.
+elif test -x "$(command -v pacman)" ; then
+    alias update='sudo pacman -Syu --noconfirm'                     # Upgrade installed applications.
+    alias query='sudo pacman -Qe'                                   # Query explicitly-installed packages.
+    alias inst='sudo pacman -S --noconfirm'                         # Install package.
+    alias uinst='sudo pacman -Rns --noconfirm'                      # Remove/uninstall application.
+    alias srch='pacman -Ss'                                         # Search for application.
+fi
 
-alias add='git add .'                                           # Add all changes to local git repo.
-alias new='git init'                                            # Initialize new local git repo.
-alias branch='git checkout'                                     # Switch between git repo branches.
-alias tag='git tag -a'                                          # Create git tag.
-alias delete='git branch -D'                                    # Delete git branch.
-alias checkout='git checkout -b'                                # Create new git repo branch.
-alias merge='git merge'                                         # Merge git repo.
-alias pat='git checkout --patch'                                # Patch git repo.
-alias sub='git submodule add'                                   # Add git submodule.
-alias upsub='git submodule update --recursive --remote'         # Update git submodule.
-alias commit='git commit -m'                                    # Commit changes with message.
-alias push='git push origin $(git describe --abbrev=0)'         # Push current tag to remote.
-alias github='git push origin $(git symbolic-ref --short HEAD)' # Push current branch to remote.
+if test -x "$(command -v git)" ; then
+    alias add='git add .'                                           # Add all changes to local git repo.
+    alias new='git init'                                            # Initialize new local git repo.
 
-alias clone='gh repo clone'                                     # Clone a git repository.
-alias create='gh release create'                                # Create new Github release.
-alias delete='gh release delete --yes'                          # Delete Github release.
-alias delasset='gh release delete-asset --yes'                  # Delete Github release asset.
-alias upload='gh release upload --clobber'                      # Upload release asset.
-alias repo='gh repo create'                                     # Create new Github repo.
+    if test ! -x "$(command -v gh)" ; then
+        alias clone='git clone'                                     # Clone a git repository.
+    fi
 
-alias ls='ls -a --color=auto'                                   # Add color to list output.
-alias grep='grep --color=auto'                                  # Grep needs some color too.
+    alias clone='git clone'                                         # Clone a git repository.
+    alias branch='git checkout'                                     # Switch between git repo branches.
+    alias tag='git tag -a'                                          # Create git tag.
+    alias delete='git branch -D'                                    # Delete git branch.
+    alias checkout='git checkout -b'                                # Create new git repo branch.
+    alias merge='git merge'                                         # Merge git repo.
+    alias pat='git checkout --patch'                                # Patch git repo.
+    alias sub='git submodule add'                                   # Add git submodule.
+    alias upsub='git submodule update --recursive --remote'         # Update git submodule.
+    alias commit='git commit -m'                                    # Commit changes with message.
+    alias push='git push origin $(git describe --abbrev=0)'         # Push current tag to remote.
+    alias github='git push origin $(git symbolic-ref --short HEAD)' # Push current branch to remote.
+fi
+
+if test -x "$(command -v gh)" ; then
+    alias clone='gh repo clone'                                     # Clone a git repository.
+    alias create='gh release create'                                # Create new Github release.
+    alias delete='gh release delete --yes'                          # Delete Github release.
+    alias dasset='gh release delete-asset --yes'                    # Delete Github release asset.
+    alias upload='gh release upload --clobber'                      # Upload release asset.
+    alias repo='gh repo create'                                     # Create new Github repo.
+fi
+
+alias ls='ls -a --color=auto'                                       # Add color to list output.
+alias grep='grep --color=auto'                                      # Grep needs some color too.
 alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'                                # This is old but still used.
+alias egrep='egrep --color=auto'                                    # This is old but still used.
 
-alias mkdir='mkdir -p'                                          # Assume the parent directory.
+alias mkdir='mkdir -p'                                              # Assume the parent directory.
 
-alias rm='rm -v'                                                # Force removal and verbose.
-alias mv='mv -vf'                                               # Force move and verbose.
+alias rm='rm -v'                                                    # Force removal and verbose.
+alias mv='mv -vf'                                                   # Force move and verbose.
 
-alias ln='ln -vf'                                               # Always force creating of links and verbose.
+alias ln='ln -vf'                                                   # Always force creating of links and verbose.
 
-alias df='df -h'                                                # Show disk usage in human readable format.
+alias df='df -h'                                                    # Show disk usage in human readable format.
 
-alias cp='cp -a'                                                # Copy files and directories recursively.
+alias cp='cp -a'                                                    # Copy files and directories recursively.
 
-alias xz='tar cvf'                                              # Create tar.xz archive.
-alias gz='tar cvjf'                                             # Create tar.gz archive
-alias bzip2='bzip2 -zk'                                         # Create bzip archive.
-alias rar='rar a'                                               # Create rar archive.
-alias gzip='gzip -9'                                            # Create gzip archive.
-alias zip='zip -r'                                              # Create zip archive.
-alias 7z='7z a'                                                 # Create archive using 7z.
+alias xz='tar cvf'                                                  # Create tar.xz archive.
+alias gz='tar cvjf'                                                 # Create tar.gz archive
+alias bzip2='bzip2 -zk'                                             # Create bzip archive.
+alias rar='rar a'                                                   # Create rar archive.
+alias gzip='gzip -9'                                                # Create gzip archive.
+alias zip='zip -r'                                                  # Create zip archive.
+alias 7z='7z a'                                                     # Create archive using 7z.
 
-# alias status='pihole status'                                    # Show pihole status
-# alias report='cat /var/log/manhole.log | less'                  # Print log about Pihole Management.
+# alias status='pihole status'                                      # Show pihole status
+# alias report='cat /var/log/manhole.log | less'                    # Print log about Pihole Management.
 
-alias key='ssh-keygen -P "" -f'                                 # Generate ssh key without passphrase and set file name.
-alias copy='ssh-copy-id -i'                                     # Copy ssh key to remote server.
+alias key='ssh-keygen -P "" -f'                                     # Generate no passphrase ssh key.
+alias csk='ssh-copy-id -i'                                          # Copy ssh key to remote server.
 
-alias back='../'                                                # Go back one directory.
-alias home='~'                                                  # Go to user home directory.
+alias back='../'                                                    # Go back one directory.
+alias home='~'                                                      # Go to user home directory.
 
-alias nas='ssh truenas'                                         # Access local TrueNAS over ssh.
-alias router='ssh router'                                       # Access local router over ssh.
-alias pihole='ssh pihole'                                       # Access local Pihole over ssh.
-alias prox='ssh proxmox'                                        # Access local Proxmox over ssh.
+alias nas='ssh truenas'                                             # Access local TrueNAS over ssh.
+alias router='ssh router'                                           # Access local router over ssh.
+alias pihole='ssh pihole'                                           # Access local Pihole over ssh.
+alias prox='ssh proxmox'                                            # Access local Proxmox over ssh.
+alias pi='ssh docker-pi'                                            # Access local Raspberry Pi over ssh.
 
-alias pi='ssh docker-pi'                                        # Access local Raspberry Pi over ssh.
+alias nano='nano -c'                                                # Set nano to show cursor position.
 
-alias nano='nano -c'                                            # Set nano to show cursor position.
-
-alias free='free -h'                                            # Show free memory in human readable format.
+alias free='free -h'                                                # Show free memory in human readable format.
 
 # Aliases for source projects.
-alias website='code ~/Projects/website'                         # Go to website project.
-alias theme='code ~/Projects/simple-dark'                       # Go to theme project.
-alias skel='code ~/Projects/skel'                               # Go to skel project.
-alias profile='code ~/Projects/MichaelSchaecher'                # Go to Github profile.
+alias website='code ~/Projects/website'                             # Go to website project.
+alias theme='code ~/Projects/simple-dark'                           # Go to theme project.
+alias skel='code ~/Projects/skel'                                   # Go to skel project.
+alias profile='code ~/Projects/MichaelSchaecher'                    # Go to Github profile.
 
-# Start Hugo server with no cache and build drafts.
-alias server='hugo server --noHTTPCache --buildDrafts  --disableFastRender'
+if test -x "$(command -v hugo)" ; then
+    alias server='hugo server --noHTTPCache --buildDrafts  --disableFastRender'
+    alias site='hugo new site --format yaml'                        # Create new Hugo site.
+    alias content='hugo new content'                                # Create new Hugo content.
+    alias syntax='hugo gen chromastyles --style'                    # Generate Hugo syntax highlighting style.
+fi
 
-alias site='hugo new site --format yaml'                        # Create new Hugo site.
-alias content='hugo new content'                                # Create new Hugo content.
+alias helpful='cat ~/.helpful'                                      # Show helpful commands.
 
-alias reload='source ~/.profile'                                # Reload ~/.profile file.
+alias reload='source ~/.profile'                                    # Reload ~/.profile file.
 
-eval "$(starship init bash)"                                    # Start Starship Prompt.
+eval "$(starship init bash)"                                        # Start Starship Prompt.
