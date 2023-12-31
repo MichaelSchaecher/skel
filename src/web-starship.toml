@@ -21,8 +21,9 @@ command_timeout = 2_000                                         # 2 seconds to c
 
 # The default prompt symbol is "❯". I don't like it so I changed it to .
 [character]
-success_symbol = ""                                            # Normal symbol for the prompt.
-error_symbol = " [!](fg:127)"                                   # Error symbol for the prompt.
+success_symbol = ">"                                            # Normal symbol for the prompt.
+error_symbol = ">[!](fg:127)"                                   # Error symbol for the prompt.
+vicmd_symbol = ">"                                              # Vi command mode symbol for the prompt.
 format = " $symbol "
 
 # Even if disabled, VSCode will still show for the first command ran in the terminal after opening.
@@ -35,11 +36,11 @@ disabled = true                                                 # Disable the co
 
 # The directory module is enabled by default but I changed the format. The text is
 # purple and bold, and the symbol is  for the home directory. For root or read
-# only the symbol is @.
+# only the symbol is 󰃖.
 [directory]
 disabled = false
-read_only = " ! "
-home_symbol = " @ "
+read_only = " <ro> "
+home_symbol = " <home> "
 style = "bold fg:127"
 read_only_style = "bold fg:127"
 truncation_length = 1
@@ -50,7 +51,7 @@ format = " [in](bold fg:#FBD8FD) [$path]($style)[$read_only]($read_only_style)$h
 [git_branch]
 always_show_remote = false                                      # Do not show remote branch
 style = "bold fg:127"                                           # Text color.
-symbol = "  "                                                  # Git symbol.
+symbol = " [git] "                                              # Git symbol.
 truncation_length = 15                                          # Shorten long branch names.
 truncation_symbol = "..."
 only_attached = false                                           # Not attached is not an error, so show branch name.
@@ -59,17 +60,16 @@ format = "[$symbol]($style) [$branch](bold fg:225)"
 [git_status]
 disabled = false                                                # Never disable the git status module.
 style = "bold fg:127"                                           # Dark Magenta color.
-conflicted = " "                                               # Branch in conflict.
-ahead = " "                                                    # Branch is ahead by one or more commits.
-behind = " "                                                   # Branch is behind by one or more commits.
-diverged = " "                                                 # Current branch has diverged.
-up_to_date = " "                                               # Up-to-date.
-untracked = " "                                                # Untracked changes.
-stashed = " "                                                  # Stashed commit.
-modified = " "                                                 # Modified directory/file.
-staged = " "                                                   # Staged commits.
-renamed = " "                                                  # File/directory renamed.
-deleted = " "                                                  # Deleted file/dicertory.
+conflicted = " (conflict)"                                      # Branch in conflict.
+ahead = " (ahead)"                                              # Branch is ahead by one or more commits.
+behind = " (behind)"                                            # Branch is behind by one or more commits.
+diverged = " (div)"                                             # Current branch has diverged.
+up_to_date = " (current)"                                       # Up-to-date.
+untracked = " (untracked)"                                      # Untracked changes.
+staged = " (staged)"                                            # Staged changes.
+modified = " (modified)"                                        # Modified files.
+renamed = " (renamed)"                                          # Renamed files.
+deleted = " (deleted)"                                          # Deleted files.
 format = "[$all_status$ahead_behind]($style) "
 
 # The only reason to have the hostname in the prompt is to know if I'm ssh'd into a remote host.
@@ -83,7 +83,6 @@ format = "[@ssh:$hostname]($style)"
 disabled = true                                                 # Disable nodejs version and icon.
 
 [package]
-
 disabled = true                                                 # Disable package version and icon.
 
 [python]

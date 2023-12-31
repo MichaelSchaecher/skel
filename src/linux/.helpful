@@ -6,6 +6,13 @@ Function:
     more                Display a file in less with syntax highlighting using pygmentize.
     xtract              Extract compressed files with one command and file name.
 
+    sp                  This is a wrapper for scp that will copy a file to a local/remote server.
+                        Assuming that there are configuration files for the server in ~/.ssh/config
+                        or ~/.ssh/config.d/ directory. USAGE: sp [local file] [remote file] [remote server]
+
+    spf                 Just like sp but will copy a file from a local/remote server. USAGE: spf [local file]
+                        [remote file] [remote server]
+
 Aliases:
 
     update              Update and update installed packages using default Debian/Ubuntu or Arch package manager.

@@ -5,7 +5,11 @@
 
 # Set of functions to be used.
 
-# Extract an archive file.
+# Copy to local/remote server over ssh.
+function sp () { scp -r "${1}" "${3}":"${2}" ; }
+
+# Copy from local/remote server over ssh.
+function spf () { scp -r "${2}":"${2}" "${1}" ; }
 
 # Setting the more alias to use pygmentize for syntax highlighting.
 function more () {
@@ -34,9 +38,8 @@ function xtract () {
         *.7z                )    7z x "${1}"                     ;;
         *                   )
             # Echo common error regardless if file exists.
-            test -f "${1}" && {
-                echo "${1} archive type or file not supported!" ; return ; }
-                ;;
+            test -f "${1}" && { echo "${1} archive type or file not supported!" ; return ; }
+        ;;
     esac
 
 }
@@ -64,11 +67,13 @@ function histControl () {
     # Rewrite the history file, removing all duplicates preserving the most recent version of the
     # command. This is done by reversing the order of the history file, removing duplicates, then
     # reversing the order again to put the history file back in the correct order.
-    tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
-    tac ~/.bash_history.old > "${HISTFILE}"
+    if test -f ~/.bash_history.old ; then
+        tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
+        tac ~/.bash_history.old > "${HISTFILE}"
+        rm ~/.bash_history.old > /dev/null 2>&1
+    fi
 
-    # Remove the temporary history file.
-    test ! -f ~/.bash_history.old || rm ~/.bash_history.old > /dev/null 2>&1
+    return
 
 }
 
@@ -85,17 +90,25 @@ shopt -s checkwinsize ; shopt -s autocd     ; shopt -s cdspell ; shopt -s extglo
 shopt -s histappend   ; shopt -s cmdhist ; shopt -s lithist         # Manage bash history.
 
 # If `shopt -s histappend` is Then allow the history to be search if using similar command.
-bind '"\033[A": history-search-backward' ; bind '"\033[B": history-search-forward'
+test -n "${SSH_CLIENT}" || { bind '"\e[A": history-search-backward' ; bind '"\e[B": history-search-forward' ; }
 
 source "/usr/share/bash-completion/bash_completion"                 # Enable bash completion.
 
 # Check if hugo is installed, it installed add it to the path.
 test ! -x "$(command -v hugo)" || source <(hugo completion bash)
 
-eval "$(dircolors -b ~/.dir_colors)"                                # Set new color scheme for `ls` command.
+# Source starship completions.
+test ! -x "$(command -v starship)" || source <(starship completions bash)
 
-# Shellcheck disable=SC2034
-starship_precmd_user_func="histControl"                             # Manage the bash history.
+test -f ~/.web || touch ~/.web                                      # Create `/.web` file if it does not exist.
+
+# Source the right config file for starship based if the file ~/.web is present and that not connected
+# over ssh. This is for if you login via web browser only. This is done because most web browsers default
+# fonts are not nerd fonts, so the icons don't show up correctly.
+test -f ~/.web && test -z "${SSH_CLIENT}" &&
+export STARSHIP_CONFIG=~/.config/web-starship.toml || export STARSHIP_CONFIG=~/.config/starship.toml
+
+STARSHIP_LOG="errors" ; export STARSHIP_LOG                         # Don't show errors for Starship.
 
 # Set ASCII 256bit color.
 BLUE="38;5;63"    ; CYAN="38;5;109" ; GREEN="38;5;78"  ; ORANGE="38;5;208"
@@ -121,7 +134,7 @@ export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_so \
 
 GROFF_NO_SGR="1" ; export GROFF_NO_SGR                              # for konsole and gnome-terminal.
 
-STARSHIP_LOG="error" ; export STARSHIP_LOG                          # Don't show Starship warnings or errors.
+eval "$(dircolors -b ~/.dir_colors)"                                # Set new color scheme for `ls` command.
 
 alias gcc='gcc -fdiagnostics-color=auto'                            # Add color to gcc.
 
@@ -140,15 +153,13 @@ elif test -x "$(command -v pacman)" ; then
     alias srch='pacman -Ss'                                         # Search for application.
 fi
 
+# Check if git is installed and add aliases.
 if test -x "$(command -v git)" ; then
     alias add='git add .'                                           # Add all changes to local git repo.
     alias new='git init'                                            # Initialize new local git repo.
 
-    if test ! -x "$(command -v gh)" ; then
-        alias clone='git clone'                                     # Clone a git repository.
-    fi
+    test -x "$(command -v gh)" || alias clone='git clone'           # Clone a git repository.
 
-    alias clone='git clone'                                         # Clone a git repository.
     alias branch='git checkout'                                     # Switch between git repo branches.
     alias tag='git tag -a'                                          # Create git tag.
     alias delete='git branch -D'                                    # Delete git branch.
@@ -162,13 +173,22 @@ if test -x "$(command -v git)" ; then
     alias github='git push origin $(git symbolic-ref --short HEAD)' # Push current branch to remote.
 fi
 
+# Check if Github CLI is installed and add aliases.
 if test -x "$(command -v gh)" ; then
     alias clone='gh repo clone'                                     # Clone a git repository.
-    alias create='gh release create'                                # Create new Github release.
-    alias delete='gh release delete --yes'                          # Delete Github release.
-    alias dasset='gh release delete-asset --yes'                    # Delete Github release asset.
+    alias releas='gh release create'                                # Create new Github release.
+    alias delrel='gh release delete --yes'                          # Delete Github release.
+    alias delast='gh release delete-asset --yes'                    # Delete Github release asset.
     alias upload='gh release upload --clobber'                      # Upload release asset.
     alias repo='gh repo create'                                     # Create new Github repo.
+fi
+
+# Hugo aliases.
+if test -x "$(command -v hugo)" ; then
+    alias server='hugo server --noHTTPCache --buildDrafts  --disableFastRender'
+    alias site='hugo new site --format yaml'                        # Create new Hugo site.
+    alias content='hugo new content'                                # Create new Hugo content.
+    alias syntax='hugo gen chromastyles --style'                    # Generate Hugo syntax highlighting style.
 fi
 
 alias ls='ls -a --color=auto'                                       # Add color to list output.
@@ -176,16 +196,16 @@ alias grep='grep --color=auto'                                      # Grep needs
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'                                    # This is old but still used.
 
-alias mkdir='mkdir -p'                                              # Assume the parent directory.
+alias mkdir='mkdir -vp'                                             # Assume the parent directory.
 
 alias rm='rm -v'                                                    # Force removal and verbose.
-alias mv='mv -vf'                                                   # Force move and verbose.
+alias mv='mv -v'                                                    # Force move and verbose.
 
-alias ln='ln -vf'                                                   # Always force creating of links and verbose.
+alias ln='ln -v'                                                    # Always force creating of links and verbose.
 
 alias df='df -h'                                                    # Show disk usage in human readable format.
 
-alias cp='cp -a'                                                    # Copy files and directories recursively.
+alias cp='cp -av'                                                   # Copy files and directories recursively.
 
 alias xz='tar cvf'                                                  # Create tar.xz archive.
 alias gz='tar cvjf'                                                 # Create tar.gz archive
@@ -195,14 +215,14 @@ alias gzip='gzip -9'                                                # Create gzi
 alias zip='zip -r'                                                  # Create zip archive.
 alias 7z='7z a'                                                     # Create archive using 7z.
 
-test ! -x $(command -v pihole) || alias status='pihole status'      # Show pihole status
+test ! -x "$(command -v pihole)" || alias status='pihole status'    # Show pihole status
 
 alias key='ssh-keygen -P "" -f'                                     # Generate no passphrase ssh key.
 alias csk='ssh-copy-id -i'                                          # Copy ssh key to remote server.
 
 alias nas='ssh truenas'                                             # Access local TrueNAS over ssh.
 alias router='ssh router'                                           # Access local router over ssh.
-alias pihole='ssh pihole'                                           # Access local Pihole over ssh.
+alias pihole='ssh dns'                                              # Access local Pihole over ssh.
 alias prox='ssh proxmox'                                            # Access local Proxmox over ssh.
 alias pi='ssh docker-pi'                                            # Access local Raspberry Pi over ssh.
 
@@ -219,15 +239,8 @@ alias theme='code ~/Projects/simple-dark'                           # Go to them
 alias skel='code ~/Projects/skel'                                   # Go to skel project.
 alias profile='code ~/Projects/MichaelSchaecher'                    # Go to Github profile.
 
-if test -x "$(command -v hugo)" ; then
-    alias server='hugo server --noHTTPCache --buildDrafts  --disableFastRender'
-    alias site='hugo new site --format yaml'                        # Create new Hugo site.
-    alias content='hugo new content'                                # Create new Hugo content.
-    alias syntax='hugo gen chromastyles --style'                    # Generate Hugo syntax highlighting style.
-fi
-
 alias helpful='cat ~/.helpful'                                      # Show helpful commands.
 
 alias reload='source ~/.profile'                                    # Reload ~/.profile file.
 
-eval "$(starship init bash)"                                        # Start Starship Prompt.
+histControl ; eval "$(starship init bash)"                          # Initialize Starship.

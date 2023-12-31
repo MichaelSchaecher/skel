@@ -13,6 +13,8 @@
 - [Installation](#installation)
   - [Debian/Ubuntu](#debianubuntu)
     - [Install the fonts Linux](#install-the-fonts-linux)
+    - [Install the dot files](#install-the-dot-files)
+    - [Help and Web](#help-and-web)
   - [Windows](#windows)
     - [Install the fonts Windows](#install-the-fonts-windows)
 
@@ -50,6 +52,8 @@ sudo cp -v src/fonts/FiraCode/* /usr/local/share/fonts/FiraCode/
 sudo fc-cache -fv
 ```
 
+#### Install the dot files
+
 Install [Starship Prompt](https://starship.rs/) with the following command: `curl -fsSL https://starship.rs/install.sh |sudo sh -s -- --yes`. This will install Starship Prompt in `/usr/local/bin/starship`. Now clone this repository and copy the files to your home, /etc/skel and /root directories with the following commands:
 
 ```bash
@@ -79,6 +83,12 @@ sudo mkdir -v /{etc/skel,root}/.config
 sudo cp -v src/starship.toml /{etc/skel,root}/.config/
 sudo cp -v src/linux/.* /{etc/skel,root}/
 ```
+
+#### Help and Web
+
+A dot file for displaying help info relating to functions and aliases is included. To use it just type copy the command `cp -av src/linux/.helpful ~/` and then type `helpful` in the terminal.
+
+Also a hidden `.web` is required for the [Starship Prompt](https://starship.rs/) to work with default font styles for most browsers. The file is created when you log into a new shell if the file doesn't exist. To create the file manually, type `touch ~/.web` in the terminal.
 
 ### Windows
 
