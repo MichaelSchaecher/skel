@@ -11,20 +11,23 @@ $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $principal = New-Object Security.Principal.WindowsPrincipal $identity
 $isAdmin = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-# Reload PowerShell profile if need. This may not work if to many changes are made to Profile.ps1 script.
-function profile { & $PROFILE.CurrentUserAllHosts }
-
-# Navigating Windows is not like Linux and at times a bit confusing.
-
-function back  { Set-Location ..\.. }                           # Useful shortcuts for traversing directories.
-function hom { Set-Location $HOME }                             # Go home from anywhere.
-
-function local  { Set-Location HKLM: }                          # Machine drives local.
-function remote  { Set-Location HKCU: }                         # Machine drives remote.
+# Add the system path.
+$env:Path += ";C:\Program Files\handBrake;$HOME\AppData\Local\scripts"
 
 # Set title for window header to ADMIN if the user is running as Administrator.
 $Host.UI.RawUI.WindowTitle = "PowerShell {0}" -f $PSVersionTable.PSVersion.ToString()
 if ($isAdmin) { $Host.UI.RawUI.WindowTitle += " - ADMIN" }
+
+# Invoke-WebRequest is kind of a miss unlike wget which is a bet easier to understand.
+If (Test-Path Alias:wget) {Remove-Item Alias:wget}
+
+# Navigating Windows is not like Linux and at times a bit confusing.
+
+function back  { Set-Location ..\.. }                           # Useful shortcuts for traversing directories.
+function home { Set-Location $HOME }                             # Go home from anywhere.
+
+function local  { Set-Location HKLM: }                          # Machine drives local.
+function remote  { Set-Location HKCU: }                         # Machine drives remote.
 
 # Add sudo admin functionality to command entered in PowerShell terminal.
 function admin
@@ -40,10 +43,8 @@ function admin
     }
 }
 
-Set-Alias -Name sudo -Value admin
-
 # Does the the rough equivalent of dir /s /b. For example, dirs *.png is dir /s /b *.png
-function dirs {
+function find ($args) {
     if ($args.Count -gt 0) {
         Get-ChildItem -Recurse -Include "$args" | Foreach-Object FullName
     } else {
@@ -58,9 +59,6 @@ function df { get-volume }                                      # List drive inf
 
 # Touch command just Linux one used on most Linux Distrabution.
 function touch($file) { "" | Out-File $file -Encoding ASCII }
-
-# Invoke-WebRequest is kind of a miss unlike wget which is a bet easier to understand.
-If (Test-Path Alias:wget) {Remove-Item Alias:wget}
 
 function wget($url) {
         $name = ($url -split '/')[-1]
@@ -108,29 +106,48 @@ function inst ($app) {
 # WSL add Linux commandline functionality to Windows, because of this having some alias's and default
 # for WSL is required. Though to my liking I am foregoing installing distro's through the app and opting
 # emport them.
-
 function srch ($app) { winget search $app }                     # Search winget and MS Store for apps.
-
 function uinst ($app) { winget uninstall $app }                 # Uninstall application.
-
 function update () { winget upgrade --all }                     # Upgrade all installed packages.
 
 function linux ($name) { wsl -d $name }                         # Start WSL with desired distro.
+function stop () { wsl -shutdown }                              # Shutdown wsl stopping all running distro's.
+function quiet ($name) { wsl --terminate $name }                # Quiet a running wsl distro.
 
-function stop-wsl () { wsl -shutdown }                          # Shutdown wsl stopping all running distro's.
+function import ($name, $directory, $location) {
 
-function quiet-wsl ($name) { wsl --terminate $name }            # Quiet a running wsl distro.
+        $distroLocation = '$HOME\$distroLocation\'
 
-function reload () { . $HOME\Documents\PowerShell\profile.ps1 } # Reload PowerShell profile.
-
-$distroLocation = 'D:\distributions\'
-
-function emport-distro ($name, $directory, $location) {
         if (Test-Path -Path $distroLocation\$directory) {
-                wsl --import $name '$distroLocation\$directory' '$location'
-        } else {
-                 Write-Host "Install location doesn't exist!"
+                # Create the directory if it doesn't exist.
+                mkdir $location
         }
+
+        wsl --import $name '$HOME\$distroLocation\$directory' '$location'
 }
+
+function export ($name, $directory) {
+
+        # Create backup name based on date taken.
+        $date = Get-Date -Format "yyyy-MM-dd"
+
+        $name = $name + "_" + $date + ".tar"
+
+        wsl --export $name '$directory\$name'
+}
+
+# Call up the help menu for this profile script.
+function helpful () {
+
+        # Read the help file in PowerShell directory.
+        $help = Get-Content -Path "$HOME\Documents\PowerShell\helpful.txt"
+
+        # Print the help file.
+        Write-Output $help
+}
+
+function reload () { . $PROFILE.CurrentUserAllHosts }           # Reload PowerShell profile.
+
+Set-Alias -Name sudo -Value admin
 
 Invoke-Expression (&starship init powershell)

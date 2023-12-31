@@ -1,0 +1,42 @@
+This is the help menu for PowerShell profile.ps1 script to aid those like that are old.
+Something are adapted to be more Linux like, since that is what I do more work in.
+
+functions
+
+    back                Go back to parent directory.
+    home                Go to uses home profile location.
+    local               Go to Machine drives local. WARNING: This is a danger zone.
+    remote              Go to Machine drives remote. WARNING: This is a danger zone.
+
+    admin               Give yourself admin rights. Similar to sudo in Linux but less
+                        secure.
+
+    find                Find a file or directory. USAGE: find 'file name'.
+    mkdir               Create directory similar to using mkdir with `-p` switch.
+    df                  Get volume size.
+    touch               Create empty file.
+    wget                Download content from the internet.
+    sed                 find and replace text within a file.
+    unzip               Unzip a compressed zip file into current location.
+    find-file           Similar to find, but a bit more powerful
+    which               Check if applications command is installed.
+
+    pgrep               Find a running applications service id.
+    pkill               Kill running application using name of actual app name.
+
+    inst                Install application using winget.
+    uinst               Uninstall application using winget.
+    srch                Search winget's repository for available packages with give
+                        name or source id. This includes Windows Store apps.
+    update              Update all packages with available updates.
+
+    linux               Start a given WSL distro.
+    stop                Stop a given WSL distro.
+    quiet               Force stop a given WSL distro.
+    import              Import a bootstrapped distro's tarball into WSL. NOTE: Must be a
+                        tar file of the root of the file system.
+    export              Create a tar backup of a given distro. NOTE: the distro must be
+                        stopped in order for this to take place.
+    reload              Reload and source the default user $PROILE for PowerShell.
+
+    helpful             Displace this very helpful info
