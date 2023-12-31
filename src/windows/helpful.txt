@@ -37,6 +37,6 @@ functions
                         tar file of the root of the file system.
     export              Create a tar backup of a given distro. NOTE: the distro must be
                         stopped in order for this to take place.
-    reload              Reload and source the default user $PROILE for PowerShell.
+    reload              Reload and source the default user $PROFILE for PowerShell.
 
     helpful             Displace this very helpful info
