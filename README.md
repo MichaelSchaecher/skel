@@ -26,6 +26,7 @@ This is my custom dot files for Debian/Ubuntu and Windows using [Starship Prompt
 
 - [x] [Starship Prompt](https://starship.rs/)
 - [x] [bash](https://www.gnu.org/software/bash/)
+- [x] [fish](https://fishshell.com/)
 - [x] Custom aliases
 - [x] Custom functions
 - [x] Scrollable history with arrow keys (Up and Down)

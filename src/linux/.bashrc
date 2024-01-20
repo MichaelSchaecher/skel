@@ -9,7 +9,7 @@
 function sp () { scp -r "${1}" "${3}":"${2}" ; }
 
 # Copy from local/remote server over ssh.
-function spf () { scp -r "${2}":"${2}" "${1}" ; }
+function spf () { scp -r "${3}":"${2}" "${1}" ; }
 
 # Setting the more alias to use pygmentize for syntax highlighting.
 function more () {
@@ -44,36 +44,31 @@ function xtract () {
 
 }
 
-# This bash profile uses Starship as the prompt, as a result the bash history needs the handled differently.
+# Check if connected over ssh.
+function sshCheck () { test -n "${SSH_CLIENT}" && echo "ssh:" || return ; }
+
 function histControl () {
 
-    # Use the default `starship_precmd` with history -w to write the history to the history file.
-    PROMPT_COMMAND="starship_precmd; history -w"
+    STARSHIP_LOG="errors" ; export STARSHIP_LOG                         # Don't show errors for Starship.
 
-    # Ignore duplicate commands and commands that start with a space.
-    HISTCONTROL="ignoreboth"
+    PROMPT_COMMAND="starship_precmd; history -w"                        # Write history to history file.
 
-    # Ignore the following commonly used commands.
-    HISTIGNORE="&:ls:[bf]g:exit:clear:history:pwd:cd:source"
+    HISTCONTROL="ignoreboth"                                            # Ignore duplicate commands.
 
-    # A Larger history file size would is better.
-    HISTFILESIZE="100000" ; export  HISTSIZE="1000000"
+    HISTIGNORE="&:ls:[bf]g:exit:clear:history:pwd:cd:source"            # Ignore common commands.
 
-    # Add date and time for commands, with color.
-    HISTTIMEFORMAT=$(echo -e "\e[${PURPLE}m%d/%m/%y %T \e[0m")
+    HISTFILESIZE="100000" ; export  HISTSIZE="1000000"                  # Set history file size.
+
+    HISTTIMEFORMAT=$(echo -e "\e[${PURPLE}m%d/%m/%y %T \e[0m")          # Add date and time to history.
 
     export PROMPT_COMMAND HISTCONTROL HISTIGNORE HISTFILESIZE HISTSIZE HISTTIMEFORMAT
 
     # Rewrite the history file, removing all duplicates preserving the most recent version of the
     # command. This is done by reversing the order of the history file, removing duplicates, then
     # reversing the order again to put the history file back in the correct order.
-    if test -f ~/.bash_history.old ; then
-        tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
-        tac ~/.bash_history.old > "${HISTFILE}"
-        rm ~/.bash_history.old > /dev/null 2>&1
-    fi
-
-    return
+    tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
+    tac ~/.bash_history.old > "${HISTFILE}"
+    rm ~/.bash_history.old > /dev/null 2>&1
 
 }
 
@@ -85,7 +80,7 @@ test ! -n "${PS1}" || source "/usr/share/bash-completion/bash_completion"
 test ! -x "$(command -v hugo)" || source <(hugo completion bash)
 
 # Enable some useful feature that makes `bash` more like `zsh` then people think.
-shopt -s checkwinsize ; shopt -s autocd     ; shopt -s cdspell ; shopt -s extglob ;
+shopt -s checkwinsize ; shopt -s autocd  ; shopt -s cdspell ; shopt -s extglob ;
 
 shopt -s histappend   ; shopt -s cmdhist ; shopt -s lithist         # Manage bash history.
 
@@ -105,14 +100,21 @@ test -f ~/.web || touch ~/.web                                      # Create `/.
 # Source the right config file for starship based if the file ~/.web is present and that not connected
 # over ssh. This is for if you login via web browser only. This is done because most web browsers default
 # fonts are not nerd fonts, so the icons don't show up correctly.
-test -f ~/.web && test -z "${SSH_CLIENT}" &&
-export STARSHIP_CONFIG=~/.config/web-starship.toml || export STARSHIP_CONFIG=~/.config/starship.toml
 
-STARSHIP_LOG="errors" ; export STARSHIP_LOG                         # Don't show errors for Starship.
+# Check if the file ~/.web exists and if not connected over ssh.
+if test -f ~/.web && test -z "${SSH_CLIENT}" ; then export STARSHIP_CONFIG=~/.config/web-starship.toml ; fi
+
+# Use the default config file if not connected with web browser.
+if test -z "${SSH_CLIENT}" || test -n "${SSH_CLIENT}" ; then export STARSHIP_CONFIG=~/.config/starship.toml ; fi
+
+# Add .local/bin to the path.
+test -d ~/.local/bin && PATH="$HOME/.local/bin:$PATH" || true
 
 # Set ASCII 256bit color.
 BLUE="38;5;63"    ; CYAN="38;5;109" ; GREEN="38;5;78"  ; ORANGE="38;5;208"
-PURPLE="38;5;127" ; RED="38;5;202"  ; LIGHT="38;5;225" ; H_LIGHT="48;5;225"
+PURPLE="38;5;127" ; RED="38;5;202"  ; LIGHT="38;5;225"
+
+H_LIGHT="48;5;225" ; H_DARK="48;5;127"
 
 # Colored GCC warnings and errors
 GCC_COLORS="error=$RED:warning=$ORANGE:note=$BLUE:caret=$PURPLE:locus=$CYAN:quote=$GREEN" ; export GCC_COLORS
@@ -222,9 +224,13 @@ alias csk='ssh-copy-id -i'                                          # Copy ssh k
 
 alias nas='ssh truenas'                                             # Access local TrueNAS over ssh.
 alias router='ssh router'                                           # Access local router over ssh.
-alias pihole='ssh dns'                                              # Access local Pihole over ssh.
+
+test -x "$(command -v pihole)" || alias pihole='ssh pihole'         # Access local Pihole over ssh.
+
 alias prox='ssh proxmox'                                            # Access local Proxmox over ssh.
-alias pi='ssh docker-pi'                                            # Access local Raspberry Pi over ssh.
+alias tunnel='ssh cloudflared'                                      # Access local Raspberry Pi over ssh.
+alias vault='ssh vaultwarden'                                       # Access local Vaultwarden over ssh.
+alias emby='ssh emby'                                               # Access local Emby Media Server over ssh.
 
 alias nano='nano -c'                                                # Set nano to show cursor position.
 
@@ -243,4 +249,10 @@ alias helpful='cat ~/.helpful'                                      # Show helpf
 
 alias reload='source ~/.profile'                                    # Reload ~/.profile file.
 
-histControl ; eval "$(starship init bash)"                          # Initialize Starship.
+alias hist='history'                                                # Show bash history.
+
+alias ping='ping -c 10'                                             # Ping 5 times.
+
+starship_precmd_user_func="histControl"                             # Run histControl function.
+
+eval "$(starship init bash)"                                        # Initialize Starship.
