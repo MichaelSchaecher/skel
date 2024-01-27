@@ -1,103 +1,91 @@
 # ~/.config/starship.toml
 # This is my starship.toml file for my personal computer at home running KDE Neon and/or Windows 10/11.
 # feel free to use it as a template for your own starship.toml file if you like it or the color purple.
-# Using 256bit colors in the terminal:
-# - Purple: 127
-# - Ligth: 225
-# Text styles is always bold.
-[line_break]
-disabled = true                                                 # Stop allowing a divided prompt
-add_newline = false                                             # Do not add new line after command completion.
-format = """
-($username$hostname)
-[$directory]
-($git_branch$git_status)
-$character
-"""
 
-# Set default prompt character to a treminal symbol like this ▸
+# Using the first 15 of 256bit colors in the terminal - 0-15: System colors https://jonasjacek.github.io/colors/
+
+# Black = 0, Maroon = 1, Green = 2, Olive = 3,   Navy = 4,  Purple = 5,   Teal = 6,  Silver = 7,
+# Grey = 8,  Red = 9,    Lime = 10, Yellow = 11, Blue = 12, Fuchsia = 13, Aqua = 14, White = 15
+
+# A continuation prompt that displays two filled in arrows
+
+[line_break]
+disabled = true                                                         # Stop allowing a divided prompt
+add_newline = false                                                     # Do not add new line after command completion.
+
 [character]
-success_symbol = "►"                                           # Normal symbol for the prompt.
-error_symbol = "[►](fg:127)"                                   # Error symbol for the prompt.
-vicmd_symbol = "►"                                             # Vi command mode symbol for the prompt.
+success_symbol = '[::](bold fg:14)'                                     # Normal symbol for the prompt.
+error_symbol = '[::](bold fg:1)'                                        # Error symbol for the prompt.
 format = " $symbol "
 
-# Even if disabled, VSCode will still show for the first command ran in the terminal after opening.
 [cmd_duration]
-disabled = true                                                 # Disable the command execution time.
+disabled = true                                                         # Disable the command execution time.
 
-# Disable the container module.
 [container]
-disabled = true                                                 # Disable the container module.
+disabled = true                                                         # Disable the container module.
 
-# The directory module is enabled by default but I changed the format. The text is
-# purple and bold, and the symbol is  for the home directory. For root or read
-# only the symbol is 󰃖.
 [directory]
-disabled = false
-read_only = " ! "
-home_symbol = " ~ "
-style = "bold fg:127"
-read_only_style = "bold fg:127"
-truncation_length = 1
-format = " [in](bold fg:#FBD8FD) [$path]($style)[$read_only]($read_only_style)$home_symbol"
+disabled = false                                                        # Enable the directory module.
+read_only = ' !!'                                                       # Read only symbol.
+home_symbol = "~"                                                       # Use default symbol for home directory.
+style = "bold fg:14"                                                    # Teal and bold for directory text.
+read_only_style = "bold fg:9"                                           # Red and bold for read only text.
+truncation_length = 2                                                   # Truncate long directory names.
+truncation_symbol = ".../"                                              # Truncate symbol.
+format = ' [>>](bold fg:8) [$path$home_symbol]($style)[$read_only]($read_only_style)'
 
-# Git Branch name is very useful, but sometimes the name is too long. A truncated name is a
-# good sign that the branch name needs work.
 [git_branch]
-always_show_remote = false                                      # Do not show remote branch
-style = "bold fg:127"                                           # Text color.
-symbol = "  "                                                  # Git symbol.
-truncation_length = 15                                          # Shorten long branch names.
-truncation_symbol = "..."
-only_attached = false                                           # Not attached is not an error, so show branch name.
-format = "[$symbol]($style) [$branch](bold fg:225)"
+always_show_remote = false                                              # Do not show remote branch
+symbol = ' [](bold fg:8) '                                             # Unicode Git symbol (U+E0A0)
+truncation_length = 15                                                  # A branch name that is to long should be truncated.
+truncation_symbol = "..."                                               # Truncate symbol.
+only_attached = false                                                   # Not attached is not an error, so show branch name.
+format = '$symbol[$branch(:$remote_branch)](bold fg:5)'
 
 [git_status]
-disabled = false                                                # Never disable the git status module.
-style = "bold fg:127"                                           # Dark Magenta color.
-conflicted = " "                                               # Branch in conflict.
-ahead = " "                                                    # Branch is ahead by one or more commits.
-behind = " "                                                   # Branch is behind by one or more commits.
-diverged = " "                                                 # Current branch has diverged.
-up_to_date = " "                                               # Up-to-date.
-untracked = " "                                                # Untracked changes.
-stashed = " "                                                  # Stashed commit.
-modified = " "                                                 # Modified directory/file.
-staged = " "                                                   # Staged commits.
-renamed = " "                                                  # File/directory renamed.
-deleted = " "                                                  # Deleted file/dicertory.
-format = "[$all_status$ahead_behind]($style) "
+disabled = false                                                        # Never disable the git status module.
+conflicted = " [!](bold fg:9)"                                          # Branch in conflict.
+untracked = " [?](bold fg:3)"                                           # Untracked changes.
+up_to_date = ""                                                         # No need to show up to date status
+modified = " [>](bold fg:11)"                                           # Modified directory/file.
+staged = " [+](bold fg:2)"                                              # Staged commits.
+deleted = " [-](bold fg:1)"                                             # Deleted file/dicertory.
+format = ' [\(](bold fg:5)$all_status$ahead_behind [\)](bold fg:5)'
 
-# The only reason to have the hostname in the prompt is to know if I'm ssh'd into a remote host.
 [hostname]
-ssh_only = true                                                 # Show only when ssh'd into remote host.
-trim_at = ''                                                    # Don't trim the hostname.
-style = "bold fg:#FBD8FD bg:127"                                # highlight.
-format = "[@ssh:$hostname]($style)"
+ssh_only = true                                                         # Show only when ssh'd into remote host.
+trim_at = '.'                                                           # Don't trim the hostname.
+format = '[@](bold fg:5)[ssh:$hostname](bold underline fg:5)'
 
 [nodejs]
-disabled = true                                                 # Disable nodejs version and icon.
+disabled = true                                                         # Disable nodejs version and icon.
+
+[ocaml]
+disabled = true                                                         # Disable ocaml version and icon.
 
 [package]
+disabled = true                                                         # Disable package version and icon.
 
-disabled = true                                                 # Disable package version and icon.
+[perl]
+disabled = true                                                         # Disable perl version and icon.
 
 [python]
-disabled = true                                                 # Disable python version and icon.
+disabled = true                                                         # Disable python version and icon.
 
 [rust]
-disabled = true                                                 # Disable rust version and icon.
+disabled = true                                                         # Disable rust version and icon.
 
 [ruby]
-disabled = true                                                 # Disable ruby version and icon
+disabled = true                                                         # Disable ruby version and icon
+
+[shell]
+disabled = true                                                         # Disable shell version and icon.
 
 [time]
-disabled = true                                                 # Disable clock in prompt.
+disabled = true                                                         # Disable clock in prompt.
 
 [username]
-show_always = true                                              # Yes show who I am.
-disabled = false
-style_user = "bold fg:225 bg:127"                               # Highlight.
-style_root = "bold fg:127 bg:225"                               # Highlight with lighter color.
+show_always = true                                                      # Yes show who I am.
+style_user = "bold fg:14 bg:5"                                          # Highlight with lighter color.
+style_root = "bold fg:5 bg:14"                                          # Highlight with darker color.
 format = "[$user]($style)"
