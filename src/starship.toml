@@ -14,8 +14,8 @@ disabled = true                                                         # Stop a
 add_newline = false                                                     # Do not add new line after command completion.
 
 [character]
-success_symbol = '[::](bold fg:14)'                                     # Normal symbol for the prompt.
-error_symbol = '[::](bold fg:1)'                                        # Error symbol for the prompt.
+success_symbol = '[>](bold fg:8)'                                     # Normal symbol for the prompt.
+error_symbol = '[>](bold fg:1)'                                        # Error symbol for the prompt.
 format = " $symbol "
 
 [cmd_duration]
@@ -32,7 +32,7 @@ style = "bold fg:14"                                                    # Teal a
 read_only_style = "bold fg:9"                                           # Red and bold for read only text.
 truncation_length = 2                                                   # Truncate long directory names.
 truncation_symbol = ".../"                                              # Truncate symbol.
-format = ' [>>](bold fg:8) [$path$home_symbol]($style)[$read_only]($read_only_style)'
+format = ' [+](bold fg:8) [$path$home_symbol]($style)[$read_only]($read_only_style)'
 
 [git_branch]
 always_show_remote = false                                              # Do not show remote branch

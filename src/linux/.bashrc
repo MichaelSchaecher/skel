@@ -5,6 +5,16 @@
 
 # Set of functions to be used.
 
+# Use function for creating git tags
+function tag () {
+
+    # Check if the tag already exists and if it does then delete it.
+    test -z "$(git tag -l "${1}")" || { echo "Tag already exists!" ; return ; }
+    # Create the tag using the first argument as the name and the second argument as the message.
+    git tag -a "${1}" -m "${2}"
+
+}
+
 # Copy to local/remote server over ssh.
 function sp () { scp -r "${1}" "${3}":"${2}" ; }
 
@@ -17,14 +27,11 @@ function more () {
     # Check if pygmentize is installed and use it for syntax highlighting if it is. If not use the default
     # less command.
     test -x "$(command -v pygmentize)" && pygmentize -f terminal256 -g "$1" | less -R || less "$1"
-
-    return
 }
 
 function xtract () {
 
-    # Set the default output directory based on the file name without the extension.
-    local outDir ; outDir="(echo "${1}" | awk '{print ${1}')"
+    local outDir ; outDir="(echo "${1}" | awk '{print ${1}')"           # Set output directory based on file name.
 
     # Use case menu.
     case "${1}" in
@@ -46,22 +53,20 @@ function xtract () {
 
 function histControl () {
 
-    STARSHIP_LOG="errors" ; export STARSHIP_LOG                         # Don't show errors for Starship.
     PROMPT_COMMAND="starship_precmd ; history -w"                       # Write history to history file.
-    HISTCONTROL="ignoreboth"                                            # Ignore duplicate commands.
 
-    HISTFILESIZE="100000" ; export  HISTSIZE="1000000"                  # Set history file size.
-    HISTTIMEFORMAT="$(echo -e "\e[${t}m%d/%m/%y %T \e[0m")"             # Add date and time to history.
+    HISTFILESIZE="1000" ; HISTSIZE="10000"                              # Set history file size.
+    HISTTIMEFORMAT="$(echo -e "\e[${c}m%d/%m/%y %T ${CL}")"             # Add date and time to history.
 
     # Ignore some commands from being added to the history file to prevent populating the history file with
     # redundant commands that are the most offen used.
-    HISTIGNORE="&:ls:[bf]g:exit:clear:history:pwd:cd:source:reload:helpful:ls:ll:la:lt:hist:ping"
+    HISTIGNORE="&:ls:[bf]g:exit:clear:history:pwd:cd:source:reload:ls:ll:la:lt:hist:ping"
 
     # Rewrite the history file, removing all duplicates preserving the most recent version of the
     # command. This is done by reversing the order of the history file, removing duplicates, then
     # reversing the order again to put the history file back in the correct order.
-    tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
-    tac ~/.bash_history.old > "${HISTFILE}"
+    test ! -f "~/.bash_history.old" && { tac "${HISTFILE}" | awk '!x[$0]++' > ~/.bash_history.old
+    tac ~/.bash_history.old > "${HISTFILE}" ; } || true
 
     # Remove the old history file if it exists.
     test -f "~/.bash_history.old" && rm ~/.bash_history.old > /dev/null 2>&1 || true
@@ -88,14 +93,8 @@ test ! -x "$(command -v starship)" || source <(starship completions bash)
 # over ssh. This is for if you login via web browser only. This is done because most web browsers default
 # fonts are not nerd fonts, so the icons don't show up correctly.
 
-# Check if the file ~/.web exists and if not connected over ssh.
-if test -f ~/.web && test -z "${SSH_CLIENT}" ; then export STARSHIP_CONFIG=~/.config/web-starship.toml ; fi
-
-# Use the default config file if not connected with web browser.
-if test -z "${SSH_CLIENT}" || test -n "${SSH_CLIENT}" ; then export STARSHIP_CONFIG=~/.config/starship.toml ; fi
-
 # Add .local/bin to the path.
-test -d ~/.local/bin && PATH="$HOME/.local/bin:$PATH" || true
+test -d ~/.local/bin && PATH="${PATH}:$HOME/.local/bin" || true
 
 # System colors using the 256 color palette.
 b='38;5;0'   ; r='38;5;1'   ; g='38;5;2'    ; y='38;5;3'    ; bl='38;5;4'    ; p='38;5;5'    ; c='38;5;6'    ; w='38;5;7'
@@ -105,27 +104,31 @@ bb='38;5;8'  ; br='38;5;9'  ; bg='38;5;10'  ; by='38;5;11'  ; bbl='38;5;12'  ; b
 BB='48;5;0'  ; BR='48;5;1'  ; BG='48;5;2'   ; BY='48;5;3'   ; BBL='48;5;4'   ; BP='48;5;5'   ; BC='48;5;6'   ; BW='48;5;7'
 BBB='48;5;8' ; BBR='48;5;9' ; BBG='48;5;10' ; BBY='48;5;11' ; BBBL='48;5;12' ; BBP='48;5;13' ; BBC='48;5;14' ; BBW='48;5;15'
 
+CL='\e[0m'                                                              # Clear the color.
+
 # Colored GCC warnings and errors
 GCC_COLORS="error=$m:warning=$o:note=$n:caret=$y:locus=$c:quote=$g" ; export GCC_COLORS
 
-# Some may laugh about using nano, but I barely use a cli text editor, so there.
-EDITOR=nano ; export EDITOR
+
+EDITOR=nano                                  ; export EDITOR            # Set the default editor to nano.
+
+STARSHIP_LOG="errors"                        ; export STARSHIP_LOG      # Don't show errors for Starship.
 
 # Have less display colors for manpage.
 LESS_TERMCAP_mb=$(echo -e "\e[${p};3m")      ; export LESS_TERMCAP_mb   # begin
 LESS_TERMCAP_md=$(echo -e "\e[${p}m")        ; export LESS_TERMCAP_md   # begin bold
 LESS_TERMCAP_so=$(echo -e "\e[${BP};${bc}m") ; export LESS_TERMCAP_so   # begin reverse video
 LESS_TERMCAP_us=$(echo -e "\e[${bc};4m")     ; export LESS_TERMCAP_us   # begin underline
-LESS_TERMCAP_me=$(echo -e "\e[0m")           ; export LESS_TERMCAP_me   # reset bold/underline/blink
-LESS_TERMCAP_se=$(echo -e "\e[0m")           ; export LESS_TERMCAP_se   # reset reverse video
-LESS_TERMCAP_ue=$(echo -e "\e[0m")           ; export LESS_TERMCAP_ue   # reset underline
+LESS_TERMCAP_me=$(echo -e "${CL}")           ; export LESS_TERMCAP_me   # reset bold/underline/blink
+LESS_TERMCAP_se=$(echo -e "${CL}")           ; export LESS_TERMCAP_se   # reset reverse video
+LESS_TERMCAP_ue=$(echo -e "${CL}")           ; export LESS_TERMCAP_ue   # reset underline
 
 GROFF_NO_SGR="1"                             ; export GROFF_NO_SGR      # for konsole and gnome-terminal.
 
 eval "$(dircolors -b ~/.dir_colors)"                                    # Set new color scheme for `ls` command.
 
 ### APT ALIASES ###
-alias update='sudo apt update && sudo apt upgrade --yes'                # Upgrade installed applications.
+alias update='sudo apt update && sudo apt dist-upgrade --yes'           # Upgrade installed applications.
 alias query='sudo apt list'                                             # Query explicitly-installed packages.
 alias inst='sudo apt install --yes'                                     # Install package.
 alias uinst='sudo apt purge --yes --autoremove'                         # Remove/uninstall application.
@@ -141,18 +144,18 @@ alias syntax='hugo gen chromastyles --style'                            # Genera
 alias initial='git init'                                                # Show git status.
 alias add='git add --all'                                               # Add all changes to local git repo.
 alias branch='git checkout'                                             # Switch between git repo branches.
-alias tag='git tag -a'                                                  # Create git tag.
 alias delete='git branch -D'                                            # Delete git branch.
 alias checkout='git checkout -b'                                        # Create new git repo branch.
 alias merge='git merge'                                                 # Merge git repo.
-alias patching='git checkout --patch'                                   # Patch git repo.
-alias sub='git submodule add'                                           # Add git submodule.
-alias update-sub='git submodule update --recursive --remote'            # Update git submodule.
+alias patches='git checkout --patch'                                    # Patch git repo.
+alias gitmod='git submodule add'                                        # Add git submodule.
+alias gitmodup='git submodule update --recursive --remote'              # Update git submodule.
 alias commit='git commit -m'                                            # Commit changes with message.
 alias push='git push origin'                                            # Push current tag to remote.
 
 alias github='gh repo create'                                           # Create new Github repo.
 alias clone='gh repo clone'                                             # Clone a git repository.
+alias gitsrch='gh search repos -L 50 --sort updated'                    # Search Github repos.
 alias release='gh release create'                                       # Create new Github release.
 alias remove='gh release delete-asset --yes'                            # Delete Github release asset.
 alias upload='gh release upload --clobber'                              # Upload release asset.
@@ -192,7 +195,8 @@ alias 7z='7z a'                                                         # Create
 alias key='ssh-keygen -P "" -f'                                         # Generate no passphrase ssh key.
 alias csk='ssh-copy-id -i'                                              # Copy ssh key to remote server.
 
-test -x "$(command -v pihole)" || alias pihole='ssh pihole'             # Access local Pihole over ssh in not logged in to server.
+test -x "$(command -v pihole)" ||
+alias pihole='ssh pihole'                                               # Access local Pihole over ssh in not logged in to server.
 
 alias nas='ssh truenas'                                                 # Access local TrueNAS over ssh.
 alias router='ssh router'                                               # Access local router over ssh.
@@ -220,6 +224,6 @@ alias reload='source ~/.profile'                                        # Reload
 
 alias hist='history'                                                    # Show bash history.
 
-alias ping='ping -c 10'                                                 # Ping 5 times.
+alias ping='ping -c 10'                                                 # Ping 10 times.
 
 starship_precmd_user_func="histControl" ; eval "$(starship init bash)"  # Initialize Starship and run histControl function.
